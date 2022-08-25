@@ -1,28 +1,105 @@
-html {
-  font-size: 10px; /* px means "pixels": the base font size is now 10 pixels high  */
-  font-family: "Open Sans", sans-serif; /* this should be the rest of the output you got from Google fonts */
-  background-color: #00539F;
-}
+* {
+  box-sizing: border-box;
+} 
 body {
-  width: 600px;
-  margin: 0 auto;
-  background-color: #FF9500;
-  padding: 0 20px 20px 20px;
-  border: 5px solid black;
+  font-family: Arial;
+  Margin: 0px;
+  padding: 0px;
+  background: #f1f1f1;
 }
-h1 {
-  font-size: 60px;
-  text-align: center;margin: 0;
-  padding: 20px 0;
-  color: #00539F;
-  text-shadow: 3px 3px 1px black;
+ 
+/* 头部标题 */
+.header {
+  padding: 5px;
+  text-align: center;
+  background-image:url('../images/RC.jpg');
 }
-p, li {
-  font-size: 16px;
-  line-height: 2;
-  letter-spacing: 1px;
+ 
+.header h1 {
+  font-size: 30px;
+  color:#ffffff;
 }
-img {
+.header p {
+  color:#ffffff;
+}
+ 
+/* 导航条 */
+.topnav {
+  overflow: hidden;
+ }
+ 
+/* 导航条链接 */
+.topnav a {
+  float: left;
   display: block;
-  margin: 0 auto;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+ 
+/* 链接颜色修改 */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+ 
+/* 创建两列 */
+/* Left column */
+.leftcolumn {   
+  float: left;
+  width: 75%;
+}
+ 
+/* 右侧栏 */
+.rightcolumn {
+  float: left;
+  width: 25%;
+  background-color: #f1f1f1;
+  padding-left: 20px;
+}
+ 
+/* 图像部分 */
+.fakeimg {
+  background-color: #aaa;
+  width: 100%;
+  padding: 20px;
+}
+ 
+/* 文章卡片效果 */
+.card {
+  background-color: white;
+  padding: 20px;
+  margin-top: 20px;
+}
+ 
+/* 列后面清除浮动 */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+ 
+/* 底部 */
+.footer {
+  padding: 20px;
+  text-align: center;
+  background: #ddd;
+  margin-top: 20px;
+}
+ 
+/* 响应式布局 - 屏幕尺寸小于 800px 时，两列布局改为上下布局 */
+@media screen and (max-width: 800px) {
+  .leftcolumn, .rightcolumn {   
+    width: 100%;
+    padding: 0;
+  }
+}
+ 
+/* 响应式布局 -屏幕尺寸小于 400px 时，导航等布局改为上下布局 */
+@media screen and (max-width: 400px) {
+  .topnav a {
+    float: none;
+    width: 100%;
+  }
 }
