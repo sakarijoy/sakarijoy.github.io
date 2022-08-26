@@ -65,7 +65,25 @@ body {
   width: 100%;
   padding: 20px;
 }
- 
+.img1{
+  background-image:url('../images/xiaoxiang.png');
+  width: 100%;
+  padding: 10px;
+  color: black;
+}
+.imgback{
+  width: 120px;
+  background-image:url('../images/imgback.png');
+  background-size: 100% 100%;
+  font-size: 10px;
+  padding: 10px 10px 25px 10px;
+}
+/* 分隔线效果 */
+.ge{
+  width: 100%;
+  height: 1px;
+  border-top: 1px solid #ccc;
+} 
 /* 文章卡片效果 */
 .card {
   background-color: white;
@@ -84,7 +102,7 @@ body {
 .footer {
   padding: 20px;
   text-align: center;
-  background: #ddd;
+  background: #333333;
   margin-top: 20px;
 }
  
