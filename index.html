@@ -1,69 +1,104 @@
-<!DOCTYPE html><!--文档类型-->
-<html lang="zh-CN"><!--文档的语言设置-->
-  <head>
-    <meta charset="utf-8"><!--文档使用的字符集设置为UTF-8-->
-    <meta name="viewport" content="width=device-width"><!--此视口元素确保页面以视口的宽度呈现，防止移动浏览器将页面渲染得比视口更宽，然后将它们缩小-->
-    <meta name="description" content="一个个人博客的测试案例。">
-    <link href="styles/style.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-    <link rel="icon" href="images/sakana.png" type="image/x-icon">
 
-    <title>My test page</title><!--浏览器选项卡中的标题-->
-  </head>
-  <body>
-    <div class="header">
-        <div class="topnav">
-        <a href="index.html">HOME</a>
-        <a href="page.html">PAGE</a>
-        <a href="video.html">VIDEO</a>
-        <a href="travel.html">TRAVEL</a>
-        <a href="about.html">ABOUT</a>
-      </div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="一个个人博客的测试案例。">
+
+  <title>My test page</title>
+
+  <link rel="stylesheet" href="styles/style.css">
+  <link rel="icon" href="images/sakana.png" type="image/png">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans"
+    rel="stylesheet"
+  >
+</head>
+
+<body>
+  <!-- 顶部区域 -->
+  <header class="header">
+    <nav class="topnav" aria-label="主导航">
+      <a href="index.html">HOME</a>
+      <a href="page.html">PAGE</a>
+      <a href="video.html">VIDEO</a>
+      <a href="travel.html">TRAVEL</a>
+      <a href="about.html">ABOUT</a>
+    </nav>
+
+    <div class="header-content">
       <h1>Welcome To Here</h1>
-      <p>something anout me</p>
+      <p>something about me</p>
     </div>
-    <div class="row">
-      <div class="leftcolumn">
-        <div class="card">
-          <div class="img1" style="height:300px;"><div class="imgback" style="height:20px;">2019 年 4 月 17日</div></div>
-          <h2>夏日终结</h2>
-          <p>一些文本...</p>
-          <div class="ge"></div>
-          <p>一些文本...</p>
+  </header>
 
-    </div>
-    <div class="card">
-      <h2>文章标题</h2>
-      <h5>2019 年 4 月 17日</h5>
-      <div class="fakeimg" style="height:200px;">图片</div>
-      <p>一些文本...</p>
-      <p>一些文本</p>
-    </div>
-  </div>
-  <div class="rightcolumn">
-    <div class="card">
-      <h2>关于我</h2>
-      <div class="fakeimg" style="height:100px;">图片</div>
-      <p>关于我的一些信息..</p>
-    </div>
-    <div class="card">
-      <h3>热门文章</h3>
-      <div class="fakeimg"><p>图片</p></div>
-      <div class="fakeimg"><p>图片</p></div>
-      <div class="fakeimg"><p>图片</p></div>
-    </div>
-    <div class="card">
-      <h3>关注我</h3>
-      <p>一些文本...</p>
-    </div>
-  </div>
-</div>
+  <!-- 文章区与右侧栏 -->
+  <main class="row">
 
-    </div>
+    <!-- 左侧文章列表 -->
+    <section class="leftcolumn" aria-label="博客文章">
 
-    <div class="footer" style="height:50px;">
-      <h5>Copyright © 2022 <a class="bq" href="index.html" >Sakari</a> All Rights Reserved.</h5>
-    </div>
-    <!--<script src="scripts/main.js"></script>
-  </body>
+      <!-- 特色文章 -->
+      <article class="card featured-post">
+        <div class="img1">
+          <div class="imgback">2019 年 4 月 17 日</div>
+        </div>
+
+        <h2>夏日终结</h2>
+        <p>一些文本...</p>
+        <div class="ge"></div>
+        <p>一些文本...</p>
+      </article>
+
+      <!-- 普通文章 -->
+      <article class="card">
+        <h2>文章标题</h2>
+        <h5>2019 年 4 月 17 日</h5>
+
+        <div class="fakeimg article-image">图片</div>
+
+        <p>一些文本...</p>
+        <p>一些文本...</p>
+      </article>
+
+    </section>
+
+    <!-- 右侧栏 -->
+    <aside class="rightcolumn">
+
+      <!-- 关于我 -->
+      <section class="card">
+        <h2>关于我</h2>
+        <div class="fakeimg about-image">图片</div>
+        <p>关于我的一些信息...</p>
+      </section>
+
+      <!-- 热门文章 -->
+      <section class="card">
+        <h3>热门文章</h3>
+
+        <div class="fakeimg popular-image">图片</div>
+        <div class="fakeimg popular-image">图片</div>
+        <div class="fakeimg popular-image">图片</div>
+      </section>
+
+      <!-- 关注我 -->
+      <section class="card">
+        <h3>关注我</h3>
+        <p>一些文本...</p>
+      </section>
+
+    </aside>
+  </main>
+
+  <!-- 页面底部 -->
+  <footer class="footer">
+    <p>
+      Copyright © 2022
+      <a class="bq" href="index.html">Sakari</a>
+      All Rights Reserved.
+    </p>
+  </footer>
+</body>
 </html>
