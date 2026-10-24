@@ -1,330 +1,134 @@
-/* =========================
-   1. 全局基础设置
-========================= */
-
-* {
-  box-sizing: border-box;
+/* Shared static layout. Search progressively enhances the article list. */
+:root { color-scheme: light; --ink: #243344; --muted: #596979; --accent: #275d79; --line: #e3e8ed; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: Arial, "Microsoft YaHei", sans-serif; color: var(--ink); background: #f1f3f5; line-height: 1.8; }
+img { display: block; max-width: 100%; height: auto; }
+a { color: var(--accent); text-underline-offset: 4px; }
+a:hover { color: #153e56; }
+a:focus-visible { outline: 3px solid #b46b13; outline-offset: 5px; border-radius: 2px; }
+.skip-link { position: absolute; left: 16px; top: -100px; padding: 8px 16px; background: #fff; z-index: 2; }
+.skip-link:focus { top: 12px; }
+.header { min-height: 210px; color: #fff; text-align: center; background-color: #17283c; background-image: linear-gradient(#07172933, #07172966), url("../images/header.webp"); background-position: center, center 45%; background-size: cover; background-repeat: no-repeat; }
+.topnav { display: flex; flex-wrap: wrap; max-width: 1240px; margin: 0 auto; padding: 4px 20px; text-align: left; }
+.topnav a { display: block; padding: 11px 22px; color: #fff; text-decoration: none; font-size: 15px; border-bottom: 2px solid transparent; }
+.topnav a:hover, .topnav a[aria-current="page"] { background: #ffffff18; border-bottom-color: #fff; }
+.header-content { padding: 15px 20px 28px; }
+.header h1, .header .header-title { margin: 0 0 8px; font-size: 32px; line-height: 1.4; letter-spacing: 2px; }
+.header p { margin: 0; color: #e5edf6; font-size: 15px; }
+.row { display: grid; grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr); gap: 24px; align-items: start; max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+.leftcolumn, .rightcolumn { min-width: 0; }
+.single-column { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+.card { min-width: 0; padding: 26px; margin-top: 24px; background: #fff; border: 1px solid #e9edf1; border-radius: 6px; overflow-wrap: anywhere; }
+.card h2 { margin: 8px 0 12px; font-size: 24px; line-height: 1.5; }
+.card h3 { margin: 30px 0 12px; font-size: 21px; line-height: 1.5; }
+.card p { margin: 10px 0 16px; }
+.card p:last-child { margin-bottom: 0; }
+.card .small-heading { margin: 0 0 16px; font-size: 18px; }
+.post-card h2 a { color: var(--ink); text-decoration: none; }
+.post-card h2 a:hover { color: var(--accent); text-decoration: underline; }
+.cover-link { display: block; border-radius: 3px; overflow: hidden; }
+.post-cover { width: 100%; height: auto; aspect-ratio: var(--cover-ratio, 1440 / 414); object-fit: cover; }
+.post-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 20px 0 10px; color: var(--muted); font-size: 13px; }
+.post-meta span { border-left: 1px solid #cbd5de; padding-left: 16px; }
+.text-link { display: inline-block; font-size: 14px; font-weight: 600; text-decoration: none; }
+.text-link:hover { text-decoration: underline; }
+.eyebrow { color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 2px; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 22px; }
+.button { display: inline-block; padding: 9px 20px; border-radius: 4px; color: #fff; background: var(--accent); text-decoration: none; font-size: 14px; }
+.button:hover { color: #fff; background: #17435e; }
+.profile { text-align: center; }
+.couple-avatars { display: grid; grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr); align-items: center; gap: 8px; max-width: 230px; margin: 2px auto 22px; }
+.couple-avatar { width: 100%; max-width: 76px; height: auto; aspect-ratio: 1; object-fit: cover; justify-self: center; border: 3px solid #fff; border-radius: 50%; background: #f5f1f3; box-shadow: 0 0 0 1px #eadfe4, 0 4px 12px #2633440a; }
+.couple-connection { position: relative; display: grid; place-items: center; width: 42px; height: 30px; color: #d97c90; }
+.couple-connection::before { content: ""; position: absolute; left: -8px; right: -8px; height: 1px; background: #e9bbc5; }
+.couple-connection svg { position: relative; display: block; width: 28px; height: 28px; padding: 3px; fill: currentColor; background: #fff; }
+.profile h2 { font-size: 21px; }
+.rightcolumn p { font-size: 14px; }
+.recent-post { display: block; text-decoration: none; font-size: 15px; }
+.recent-post:hover { text-decoration: underline; }
+.recent-post span { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; }
+.section-intro h2 { margin-top: 0; }
+.section-intro p { color: var(--muted); font-size: 14px; }
+.empty-state { padding: 60px 32px; text-align: center; }
+.empty-state .actions { justify-content: center; }
+.empty-state p { color: var(--muted); }
+.empty-state .button { margin-top: 12px; }
+.prose { padding: 32px; }
+.prose p, .prose li { line-height: 1.95; }
+.prose li { margin-bottom: 10px; }
+.prose ul, .prose ol { padding-left: 24px; }
+.prose h2:not(:first-child) { margin-top: 28px; }
+.notice { padding: 16px 18px; border-left: 3px solid #7293ab; background: #f3f6f9; color: #425466; }
+.breadcrumb { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 12px; }
+.breadcrumb a { text-decoration: none; }
+.prose .article-title { margin: 24px 0 12px; font-size: 30px; line-height: 1.5; }
+.article-detail .post-meta { margin: 0 0 24px; }
+.lead { color: #425466; font-size: 17px; }
+.toc { padding: 18px 24px; margin: 28px 0; border: 1px solid var(--line); border-radius: 4px; background: #f8fafb; font-size: 14px; }
+.toc ol { margin-bottom: 0; }
+.toc li { margin-bottom: 4px; }
+code { padding: 2px 5px; border-radius: 3px; background: #eef2f5; font-family: Consolas, monospace; font-size: .9em; overflow-wrap: anywhere; }
+.prose h3[id] { scroll-margin-top: 24px; }
+.article-end { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line); }
+.footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px; margin-top: 32px; padding: 22px 20px; background: #26323f; color: #e5ebf1; font-size: 12px; }
+.footer p { margin: 0; }
+.footer a { color: #e5ebf1; text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+@media (max-width: 800px) {
+  .row { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 16px; }
+  .topnav { padding: 4px 16px; }
+  .topnav a { padding: 10px 18px; }
+  .rightcolumn { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+  .profile { grid-row: span 2; }
+  .card { margin-top: 18px; }
 }
-
-html {
-  scroll-behavior: smooth;
+@media (max-width: 480px) {
+  .header { min-height: 180px; }
+  .topnav { padding: 4px 10px; }
+  .topnav a { flex: 1 1 auto; padding: 10px 8px; text-align: center; font-size: 14px; }
+  .header-content { padding: 16px 16px 24px; }
+  .header h1, .header .header-title { font-size: 27px; }
+  .header p { font-size: 13px; }
+  .row, .single-column { padding: 0 12px; }
+  .card { margin-top: 14px; padding: 20px; }
+  .card h2 { font-size: 22px; }
+  .post-meta { font-size: 12px; }
+  .post-cover { aspect-ratio: 16 / 7; }
+  .rightcolumn { display: block; }
+  .empty-state { padding: 40px 22px; }
+  .prose .article-title { font-size: 26px; }
+  .prose h3 { font-size: 20px; }
+  .lead { font-size: 16px; }
+  .toc { padding: 16px; }
+  .footer { margin-top: 24px; }
 }
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, "Microsoft YaHei", sans-serif;
-  color: #222;
-  background: #f1f1f1;
-  line-height: 1.6;
-}
-
-img {
-  max-width: 100%;
-}
-
-
-/* =========================
-   2. 顶部标题与星空背景
-========================= */
-
-.header {
-  min-height: 162px;
-  padding: 5px 0 0;
-  text-align: center;
-  color: #fff;
-
-  background-image: url("../images/RC.jpg");
-  background-size: cover;
-  background-position: center 45%;
-  background-repeat: no-repeat;
-}
-
-.topnav {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0;
-}
-
-.topnav a {
-  display: block;
-  padding: 12px 20px;
-  color: #f2f2f2;
-  text-align: center;
-  text-decoration: none;
-  font-size: 16px;
-}
-
-.topnav a:hover,
-.topnav a:focus-visible {
-  background-color: #fff;
-  color: #222;
-}
-
-.header-content {
-  padding: 0 16px 8px;
-}
-
-.header h1 {
-  margin: 18px 0 12px;
-  font-size: 30px;
-  line-height: 1.3;
-  color: #fff;
-}
-
-.header p {
-  margin: 0 0 4px;
-  color: #fff;
-  font-size: 16px;
-}
-
-/* =========================
-   3. 主体双栏布局
-========================= */
-
-.row {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr);
-  gap: 22px;
-  align-items: start;
-
-  width: 100%;
-  padding: 0 20px;
-  margin: 0 auto;
-}
-
-.leftcolumn,
-.rightcolumn {
-  min-width: 0;
-}
-
-
-/* =========================
-   4. 白色卡片
-========================= */
-.card {
-  min-width: 0;
-  padding: 20px;
-  margin-top: 20px;
-  background-color: #fff;
-  overflow-wrap: anywhere;
-}
-
-.card h2 {
-  margin: 8px 0 6px;
-  font-size: 24px;
-  line-height: 1.4;
-}
-
-.card h3 {
-  margin: 8px 0 16px;
-  font-size: 20px;
-  line-height: 1.4;
-}
-
-.card p {
-  margin: 8px 0;
-}
-
-
-/* =========================
-   5. 特色文章封面
-========================= */
-
-.img1 {
-  display: flex;
-  align-items: flex-start;
-
-  width: 100%;
-  height: 300px;
-  padding: 10px;
-
-  background-image: url("../images/xiaoxiang.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.imgback {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 130px;
-  min-height: 38px;
-  padding: 8px 14px;
-
-  border-radius: 24px;
-  background-image: url("../images/imgback.png");
-  background-color: #fff;
-  background-size: cover;
-  background-position: center;
-
-  color: #222;
-  font-size: 12px;
-}
-
-
-/* =========================
-   6. 普通图片占位框
-========================= */
-
-.fakeimg {
-  width: 100%;
-  min-height: 80px;
-  padding: 16px;
-  margin-bottom: 12px;
-
-  background-color: #aaa;
-  color: #222;
-}
-
-.article-image {
-  min-height: 200px;
-}
-
-.about-image {
-  min-height: 108px;
-}
-
-.popular-image {
-  min-height: 64px;
-  padding: 12px 16px;
-  margin-bottom: 10px;
-}
-
-
-/* =========================
-   7. 文章分隔线
-========================= */
-
-.ge {
-  width: 100%;
-  height: 1px;
-  margin: 8px 0;
-  border-top: 1px solid #ccc;
-}
-
-
-/* =========================
-   8. 页面底部
-========================= */
-
-.footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 60px;
-  padding: 12px 20px;
-  margin-top: 20px;
-
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  font-size: 12px;
-}
-
-.footer p {
-  margin: 0;
-}
-
-a.bq {
-  color: #fff;
-  text-decoration: none;
-}
-
-a.bq:hover,
-a.bq:focus-visible {
-  text-decoration: underline;
-}
-
-
-/* =========================
-   9. 平板与窄屏幕
-========================= */
-
-@media screen and (max-width: 800px) {
-  .row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-    padding: 0 16px;
-  }
-
-  .rightcolumn {
-    width: 100%;
-  }
-
-  .header {
-    min-height: 155px;
-  }
-
-  .topnav a {
-    padding: 10px 14px;
-  }
-}
-
-
-/* =========================
-   10. 手机屏幕
-========================= */
-
-@media screen and (max-width: 480px) {
-  .header {
-    min-height: 0;
-    padding-bottom: 18px;
-  }
-
-  .topnav a {
-    flex: 1 1 auto;
-    padding: 10px 8px;
-    font-size: 13px;
-  }
-
-  .header h1 {
-    margin-top: 22px;
-    font-size: 25px;
-  }
-
-  .header p {
-    font-size: 14px;
-  }
-
-  .row {
-    padding: 0 10px;
-  }
-
-  .card {
-    padding: 14px;
-    margin-top: 12px;
-  }
-
-  .card h2 {
-    font-size: 21px;
-  }
-
-  .card h3 {
-    font-size: 18px;
-  }
-
-  .img1 {
-    height: 220px;
-  }
-
-  .imgback {
-    min-width: 120px;
-    min-height: 34px;
-    font-size: 11px;
-  }
-
-  .article-image {
-    min-height: 150px;
-  }
-
-  .footer {
-    margin-top: 12px;
-    padding: 12px 8px;
-    font-size: 11px;
-  }
-}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Shared-blog details and article search. */
+[hidden] { display: none !important; }
+.archive-links { list-style: none; margin: 0; padding: 0; }
+.archive-links li + li { border-top: 1px solid var(--line); }
+.archive-links a { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; text-decoration: none; font-size: 14px; }
+.archive-links a:hover { text-decoration: underline; }
+.archive-links span { color: var(--muted); }
+.recent-post + .recent-post { margin-top: 16px; }
+.owners { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 24px 0; }
+.owner { padding: 22px; border: 1px solid var(--line); border-radius: 5px; background: #f8fafb; }
+.owner-number { color: #647e92; font-size: 12px; letter-spacing: 2px; }
+.prose .owner h3 { margin: 12px 0 8px; font-size: 20px; }
+.owner p { color: var(--muted); font-size: 14px; }
+.search-form { margin-top: 22px; }
+.search-form label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+.search-input-row { display: flex; gap: 10px; }
+.search-input-row input { width: 100%; min-width: 0; border: 1px solid #b8c7d2; border-radius: 4px; padding: 11px 12px; font: inherit; font-size: 14px; color: var(--ink); background: #fff; }
+.search-input-row input:focus-visible, .search-clear:focus-visible { outline: 3px solid #b46b13; outline-offset: 3px; }
+.search-clear { flex-shrink: 0; border: 1px solid #b8c7d2; border-radius: 4px; padding: 8px 12px; background: #f5f8fa; color: var(--accent); font: inherit; font-size: 14px; cursor: pointer; }
+.search-status { color: var(--muted); font-size: 12px; }
+.article-body h2 { margin-top: 32px; font-size: 22px; }
+.article-body pre { overflow-x: auto; padding: 16px; background: #eef2f5; border-radius: 4px; }
+.article-body pre code { padding: 0; overflow-wrap: normal; }
+.article-body img { margin: 20px 0; }
+.article-end { display: flex; flex-wrap: wrap; gap: 20px; }
+.entry-video { display: block; width: 100%; max-height: 520px; background: #17283c; margin: 24px 0; }
+@media (max-width: 480px) { .owners { grid-template-columns: minmax(0, 1fr); } }

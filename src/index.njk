@@ -1,0 +1,7 @@
+---
+layout: base.njk
+navKey: home
+permalink: /index.html
+---
+<section class="card intro-card"><p class="eyebrow">OUR LITTLE CORNER</p><h2>把日子，慢慢记下来</h2><p>{{ site.intro }}</p><div class="actions"><a class="button" href="page.html">读一些文字</a><a class="text-link" href="about.html">认识我们 →</a></div></section>
+{% for entry in collections.published | take(5) %}{% include 'card.njk' %}{% else %}<section class="card empty-state"><h2>第一篇记录正在准备中</h2><p>从今天开始，留下一点值得记住的事。</p></section>{% endfor %}

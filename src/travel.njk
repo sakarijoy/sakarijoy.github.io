@@ -1,0 +1,10 @@
+---
+layout: base.njk
+title: 旅行
+heading: 旅行
+subtitle: 为沿途的风景，留一页记录。
+navKey: travel
+permalink: /travel.html
+---
+<section class="card section-intro"><p class="eyebrow">PLACES & MEMORIES</p><h2>旅行记录</h2><p>共 {{ collections.travel.length }} 篇游记。</p></section>
+{% for entry in collections.travel %}{% include 'card.njk' %}{% else %}<section class="card empty-state"><h2>这里还没有游记</h2><p>新的游记整理好后，会出现在这里。</p><a class="button" href="page.html">先去读一篇文章</a></section>{% endfor %}

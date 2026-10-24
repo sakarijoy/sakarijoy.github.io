@@ -1,0 +1,49 @@
+{
+  "title": "我们的博客",
+  "tagline": "一起记录，慢慢收藏",
+  "description": "两个人的共同记录，分享文字、影像与沿途的风景。",
+  "intro": "把平常的日子写成文字，把路上的风景留在这里。",
+  "startYear": 2022,
+  "repository": "https://github.com/sakarijoy/sakarijoy.github.io",
+  "owners": [
+    {
+      "name": "Sakari",
+      "description": "名字已经留下，介绍慢慢补充。",
+      "avatar": "/images/avatar.webp",
+      "avatarAlt": "Sakari的头像"
+    },
+    {
+      "name": "另一位记录者",
+      "description": "名字与介绍待补充。",
+      "avatar": "/images/avatar-placeholder.svg",
+      "avatarAlt": "另一位记录者的待替换头像"
+    }
+  ],
+  "navigation": [
+    {
+      "url": "/index.html",
+      "label": "首页",
+      "key": "home"
+    },
+    {
+      "url": "/page.html",
+      "label": "文章",
+      "key": "posts"
+    },
+    {
+      "url": "/video.html",
+      "label": "视频",
+      "key": "videos"
+    },
+    {
+      "url": "/travel.html",
+      "label": "旅行",
+      "key": "travel"
+    },
+    {
+      "url": "/about.html",
+      "label": "关于",
+      "key": "about"
+    }
+  ]
+}

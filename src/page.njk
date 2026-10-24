@@ -1,0 +1,13 @@
+---
+layout: base.njk
+title: 文章
+heading: 文章
+subtitle: 把值得留下的内容，慢慢整理成篇。
+navKey: posts
+permalink: /page.html
+search: true
+---
+<section class="card section-intro"><p class="eyebrow">WORDS & NOTES</p><h2>全部文章</h2><p>共 {{ collections.posts.length }} 篇文章，按发布时间排序。</p><form class="search-form" role="search" data-search-form hidden><label for="post-search">搜索文章</label><div class="search-input-row"><input id="post-search" type="search" placeholder="输入标题、摘要、分类或作者" autocomplete="off" data-search-input><button type="button" class="search-clear" data-search-clear hidden>清空</button></div><p class="search-status" role="status" aria-live="polite" data-search-status></p></form></section>
+{% for entry in collections.posts %}{% include 'card.njk' %}{% endfor %}
+<section class="card empty-state" data-search-empty hidden><h2>没有找到相关记录</h2><p>换一个关键词，或清空搜索再看看。</p></section>
+{% if collections.posts.length == 0 %}<section class="card empty-state"><h2>文章正在准备中</h2><p>第一篇文章发布后，会出现在这里。</p></section>{% endif %}

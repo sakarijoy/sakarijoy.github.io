@@ -1,0 +1,9 @@
+---
+layout: base.njk
+title: 关于
+heading: 关于我们
+subtitle: 一起记录，也一起收藏。
+navKey: about
+permalink: /about.html
+---
+<section class="card prose"><p class="eyebrow">TWO PEOPLE, ONE BLOG</p><h2>你好，欢迎来到我们的博客</h2><p>这是两个人共同维护的一处小天地。我们想在这里留下文字、影像，以及路上的风景。</p><p>这个小站从一个简单的静态页面开始，保留了原来的星空和山景，也为以后更多的记录留出位置。</p><h2>两位记录者</h2><div class="owners">{% for owner in site.owners %}<section class="owner"><span class="owner-number" aria-hidden="true">0{{ loop.index }}</span><h3>{{ owner.name }}</h3><p>{{ owner.description }}</p></section>{% endfor %}</div><h2>从这些地方开始</h2><ul><li><a href="page.html">文章</a>：随笔与站点笔记。</li><li><a href="video.html">视频</a>：整理生活中的片段。</li><li><a href="travel.html">旅行</a>：收藏沿途的风景。</li></ul><p><a class="text-link" href="{{ site.repository }}">查看站点源码 ↗</a></p></section>

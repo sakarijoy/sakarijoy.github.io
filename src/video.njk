@@ -1,0 +1,10 @@
+---
+layout: base.njk
+title: 视频
+heading: 视频
+subtitle: 把值得分享的画面，收藏在这里。
+navKey: videos
+permalink: /video.html
+---
+<section class="card section-intro"><p class="eyebrow">FRAMES & MOMENTS</p><h2>视频记录</h2><p>共 {{ collections.videos.length }} 段视频。</p></section>
+{% for entry in collections.videos %}{% include 'card.njk' %}{% else %}<section class="card empty-state"><h2>这里还没有视频</h2><p>新的视频整理好后，会出现在这里。</p><a class="button" href="page.html">先去读一篇文章</a></section>{% endfor %}

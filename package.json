@@ -1,0 +1,18 @@
+{
+  "name": "shared-static-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node tools/clean.mjs && eleventy",
+    "dev": "node tools/clean.mjs && eleventy --serve --port=4173",
+    "check": "npm run build && node tools/check-site.mjs",
+    "preview": "node tools/preview.mjs"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "3.1.7"
+  }
+}
