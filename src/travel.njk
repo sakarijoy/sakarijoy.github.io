@@ -1,10 +1,34 @@
 ---
 layout: base.njk
 title: 旅行
-heading: 旅行
-subtitle: 为沿途的风景，留一页记录。
+heading: 把回忆，留在地图上
+subtitle: 一起走过的地方，都是故事的坐标。
 navKey: travel
 permalink: /travel.html
+wide: true
+travelMap: true
 ---
-<section class="card section-intro"><p class="eyebrow">PLACES & MEMORIES</p><h2>旅行记录</h2><p>共 {{ collections.travel.length }} 篇游记。</p></section>
-{% for entry in collections.travel %}{% include 'card.njk' %}{% else %}<section class="card empty-state"><h2>这里还没有游记</h2><p>新的游记整理好后，会出现在这里。</p><a class="button" href="page.html">先去读一篇文章</a></section>{% endfor %}
+<section class="card travel-intro"><div><p class="eyebrow">OUR TRAVEL ATLAS / 旅行足迹</p><h2>山海有迹 · 沿途有你</h2><p>在地图上重访风景，在文字里找回那一天。</p></div><div class="travel-count"><strong>{{ collections.travel.length }}</strong><span>篇旅行记录</span></div></section>
+<section class="travel-atlas" aria-label="旅行地图和游记">
+  <div class="travel-map-wrap">
+    <div class="travel-map-caption"><div><p class="eyebrow">FOLLOW OUR FOOTSTEPS</p><h2>在地图上，重访每一站</h2></div><div class="travel-map-actions"><label class="travel-route-control"><input id="travel-route" type="checkbox" checked> 按旅行日期连线</label><button id="travel-fit" type="button">查看全部点位 ↗</button></div></div>
+    <div id="travel-map" aria-label="可缩放、拖动的旅行地点地图"></div><p id="travel-map-status" role="status">正在加载地图…</p>
+  </div>
+  <section class="travel-panel" aria-labelledby="travel-stories-title">
+    <div class="travel-stories-heading"><div><p class="eyebrow">PLACES & STORIES</p><h2 id="travel-stories-title">沿途的故事</h2></div><p id="travel-status" role="status">已发表的旅行记录会显示在下方。</p></div>
+    <div class="travel-filters"><div class="travel-search-field"><label for="travel-search">搜索地点或游记</label><input id="travel-search" type="search" placeholder="输入城市、景点、标题…"></div><div><label for="travel-year">旅行年份</label><select id="travel-year"><option value="">全部年份</option></select></div><button id="travel-reset" class="travel-reset" type="button">重置筛选</button></div>
+    <div id="travel-list">
+      {% for entry in collections.travel %}
+      <article class="travel-item" data-trip data-country="{{ entry.data.location.countryCode }}" data-title="{{ entry.data.title }}" data-description="{{ entry.data.description }}" data-year="{% if entry.data.visitDateUnknown %}undated{% else %}{{ entry.date | yearOfDate }}{% endif %}" data-place="{{ entry.data.location.name }}" data-lat="{{ entry.data.location.latitude }}" data-lng="{{ entry.data.location.longitude }}">
+        <div class="travel-item-top"><p class="travel-item-place">{{ entry.data.location.name or '地点待补充' }}</p></div>
+        <h3><a href="{{ entry.url | relativeUrl(page.url) }}">{{ entry.data.title }}</a></h3>
+        {% if entry.data.visitDateUnknown %}<span class="travel-item-date">旅行日期待补充</span>{% else %}<time datetime="{{ entry.date | isoDate }}">{{ entry.date | displayDate }}</time>{% endif %}
+        <p class="travel-item-description">{{ entry.data.description }}</p>
+        <div class="travel-item-actions"><a class="text-link" href="{{ entry.url | relativeUrl(page.url) }}">阅读游记 →</a><button type="button" class="locate-trip" hidden>地图定位 ↗</button></div>
+      </article>
+      {% else %}<div class="travel-blank"><h3>下一站，等我们出发</h3><p>还没有发表的游记。添加旅行记录与地点坐标后，这里就会留下我们的足迹。</p></div>{% endfor %}
+    </div><p id="travel-no-results" hidden>没有找到匹配的旅行记录，请调整搜索条件。</p>
+  </section>
+</section>
+<section class="card travel-note"><div><p class="eyebrow">A LITTLE NOTE</p><h2>每一段旅程，都值得被收藏</h2><p>点击彩色圆点查看地点，点击游记卡片中的“地图定位”重访风景。</p></div><a class="text-link" href="page.html">也看看日常记录 →</a></section>
+<noscript><p class="notice">启用 JavaScript 后可查看互动地图；游记链接仍可直接阅读。</p></noscript>

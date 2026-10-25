@@ -19,6 +19,7 @@ export default function (eleventyConfig) {
   });
   eleventyConfig.addNunjucksFilter('take', (items, count) => items.slice(0, count));
   eleventyConfig.addNunjucksFilter('year', () => new Date().getFullYear());
+  eleventyConfig.addNunjucksFilter('yearOfDate', value => new Date(value).getUTCFullYear());
   const published = (items) => items.filter(entry => entry.data.draft !== true).sort((a, b) => b.date - a.date || a.url.localeCompare(b.url));
   eleventyConfig.addCollection('published', collection => published(collection.getFilteredByTag('entry')));
   for (const kind of ['posts', 'travel', 'videos']) {
