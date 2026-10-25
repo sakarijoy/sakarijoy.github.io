@@ -8,3 +8,4 @@ layout: base.njk
   <div class="article-body">{{ content | safe }}</div>
   <div class="article-end"><a class="text-link" href="{{ listingUrl | relativeUrl(page.url) }}">← 返回{{ listingLabel }}列表</a><a class="text-link" href="{{ '/index.html' | relativeUrl(page.url) }}">回到首页 ↑</a></div>
 </article>
+{% include 'comments.njk' %}

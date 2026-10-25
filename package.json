@@ -9,8 +9,9 @@
   "scripts": {
     "build": "node tools/clean.mjs && eleventy",
     "dev": "node tools/clean.mjs && eleventy --serve --port=4173",
-    "check": "npm run build && node tools/check-site.mjs",
-    "preview": "node tools/preview.mjs"
+    "check": "npm run build && node tools/check-site.mjs && npm run test:comments",
+    "preview": "node tools/preview.mjs",
+    "test:comments": "node --test tools/comments.test.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.7"

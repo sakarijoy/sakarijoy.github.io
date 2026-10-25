@@ -1,6 +1,6 @@
 # 我们的博客
 
-当前阶段是静态网站制作：文章内容使用 Markdown，页面由 Eleventy 生成。双人在线登录、上传、评论和 NAS 接入暂缓，后续需求保存在 docs/shared-blog-plan.md。
+当前阶段是静态网站制作：文章内容使用 Markdown，页面由 Eleventy 生成。双人在线登录、上传和 NAS 接入暂缓，后续需求保存在 docs/shared-blog-plan.md。评论区已准备接入 Twikoo，云端部署步骤见 [评论配置](docs/comments-setup.md)。
 
 ## 快速开始
 
@@ -46,10 +46,12 @@ npm run preview
 | `src/travel/*.md` | 独立旅行记录 |
 | `src/videos/*.md` | 视频介绍和已有视频文件地址 |
 | `src/_data/site.json` | 博客名称、简介、导航和两位记录者资料 |
+| `src/_data/commentService.json` | 评论开关、公开接口地址和客户端版本 |
 | `src/_includes/` | 公共页头、页脚、侧栏和文章模板 |
 | `src/*.njk` | 首页、列表、关于与 404 页面 |
 | `styles/style.css` | 公共样式 |
 | `scripts/search.js` | 静态文章搜索 |
+| `scripts/comments.js` | 评论加载和错误重试 |
 | `images/` | 图片与静态媒体 |
 | `content-templates/` | 新增内容时可复制的 Markdown 模板，不会发布 |
 | `_site/` | 生成后的可发布网页，已加入 Git 忽略 |

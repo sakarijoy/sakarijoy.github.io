@@ -132,3 +132,15 @@ code { padding: 2px 5px; border-radius: 3px; background: #eef2f5; font-family: C
 .article-end { display: flex; flex-wrap: wrap; gap: 20px; }
 .entry-video { display: block; width: 100%; max-height: 520px; background: #17283c; margin: 24px 0; }
 @media (max-width: 480px) { .owners { grid-template-columns: minmax(0, 1fr); } }
+
+/* Article comments use their own card, outside the story body. */
+.comments-section { --tk-theme-color: var(--accent); padding: 32px; }
+.comments-heading { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.comments-heading .eyebrow { font-size: 11px; letter-spacing: 1px; }
+.comments-heading h2 { margin: 4px 0 0; font-size: 23px; }
+.comments-intro, .comments-status { color: var(--muted); font-size: 14px; }
+.comments-section .comments-status { padding: 14px 16px; background: #f5f8fa; border-radius: 4px; }
+.comments-retry { padding: 9px 16px; border: 1px solid #b8c7d2; border-radius: 4px; background: #fff; color: var(--accent); font: inherit; font-size: 14px; cursor: pointer; }
+.comments-retry:focus-visible { outline: 3px solid #b46b13; outline-offset: 3px; }
+.comments-section .tk-comments { min-width: 0; }
+@media (max-width: 480px) { .comments-section { padding: 20px; } }
