@@ -134,3 +134,13 @@ coverHeight: 414
 发布状态以仓库 Actions 中的实际构建、部署结果和线上页面为准。本地预览不会自动更新线上站点。
 
 官方说明：https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
+
+## 像写文章一样添加视频
+
+1. 把 MP4 放入 media/，例如 media/我的视频.mp4。
+2. 复制 content-templates/video.md 到 src/videos/，改名为 my-video.md。
+3. 修改标题、日期、简介和 videoUrl: /media/我的视频.mp4，写正文，将 draft 改为 false 后保存。
+
+开发预览运行时，保存后刷新视频页即可。视频卡片和列表自动生成，不需要导入命令或修改页面代码。media/ 适合目前的少量小视频，图片和封面继续放 images/。
+
+现有示例为 src/videos/guidao.md，对应 media/轨道.mp4。详细字段、目录安排和发布说明见 [视频写作说明](docs/video-page.md)。

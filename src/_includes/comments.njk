@@ -2,7 +2,7 @@
 <section class="card comments-section" id="comments" aria-labelledby="comments-title"{% if commentService.envId %} data-comments data-env-id="{{ commentService.envId }}" data-comment-path="{{ commentId or page.url }}" data-client-version="{{ commentService.clientVersion }}"{% endif %}>
   <div class="comments-heading"><span class="eyebrow">把故事接着聊下去</span><h2 id="comments-title">留言与回应</h2></div>
   {% if commentService.envId %}
-  <p class="comments-intro">欢迎分享你的感受，无需注册账号。请勿在留言中填写手机号、住址等私人信息。</p>
+  <p class="comments-intro">留下昵称，聊聊你的感受，无需注册账号。</p>
   <p class="comments-status" data-comments-status role="status">正在加载评论…</p>
   <div id="twikoo-comments" data-comments-container></div>
   <button class="comments-retry" type="button" data-comments-retry hidden>重新加载评论</button>

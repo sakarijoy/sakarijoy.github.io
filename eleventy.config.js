@@ -6,7 +6,7 @@ export default function (eleventyConfig) {
     const config = JSON.parse(await readFile(new URL('./src/_data/commentService.json', import.meta.url), 'utf8'));
     validateCommentService(config);
   });
-  eleventyConfig.addPassthroughCopy({ images: 'images', styles: 'styles', scripts: 'scripts', '.nojekyll': '.nojekyll' });
+  eleventyConfig.addPassthroughCopy({ images: 'images', styles: 'styles', scripts: 'scripts', media: 'media', '.nojekyll': '.nojekyll' });
   eleventyConfig.addNunjucksFilter('relativeUrl', (target, from = '/index.html') => {
     if (/^(?:https?:|mailto:|#)/.test(target)) return target;
     const source = typeof from === 'string' ? from : '/index.html';

@@ -143,4 +143,8 @@ code { padding: 2px 5px; border-radius: 3px; background: #eef2f5; font-family: C
 .comments-retry { padding: 9px 16px; border: 1px solid #b8c7d2; border-radius: 4px; background: #fff; color: var(--accent); font: inherit; font-size: 14px; cursor: pointer; }
 .comments-retry:focus-visible { outline: 3px solid #b46b13; outline-offset: 3px; }
 .comments-section .tk-comments { min-width: 0; }
+/* Twikoo 2.0: keep only the nickname field, including reply forms. */
+.comments-section .tk-meta-input .tk-input:has(input[name="mail"]),
+.comments-section .tk-meta-input .tk-input:has(input[name="link"]) { display: none !important; }
+.comments-section .tk-meta-input .tk-input:has(input[name="nick"]) { flex: 1; width: 100%; margin: 0; }
 @media (max-width: 480px) { .comments-section { padding: 20px; } }

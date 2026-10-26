@@ -1,0 +1,11 @@
+{% if videoUrl %}
+<section class="video-watch" data-video-player aria-label="视频播放器">
+  <video class="entry-video" controls playsinline preload="metadata" aria-label="{{ title }}"{% if cover %} poster="{{ cover | relativeUrl(page.url) }}"{% endif %}>
+    <source src="{{ videoUrl | relativeUrl(page.url) }}">
+    {% if captionsUrl %}<track kind="captions" src="{{ captionsUrl | relativeUrl(page.url) }}" srclang="zh" label="中文字幕" default>{% endif %}
+    你的浏览器不支持此视频格式。
+  </video>
+  <p class="video-playback-status" data-playback-status role="status" hidden></p>
+  <div class="video-watch-links"><button type="button" data-video-retry hidden>重新加载</button><a href="{{ videoUrl | relativeUrl(page.url) }}" target="_blank" rel="noopener">打开视频文件 ↗</a></div>
+</section>
+{% else %}<p class="notice">这段影像正在整理中，视频准备好后会在这里播放。</p>{% endif %}

@@ -17,8 +17,12 @@
   <script src="{{ '/scripts/travel-countries.js' | relativeUrl(page.url) }}" defer></script>
   <script src="{{ '/scripts/travel.js' | relativeUrl(page.url) }}" defer></script>
   {% endif %}
+  {% if videoLibrary or contentType == 'video' %}
+  <link rel="stylesheet" href="{{ '/styles/video.css' | relativeUrl(page.url) }}">
+  <script src="{{ '/scripts/video.js' | relativeUrl(page.url) }}" defer></script>
+  {% endif %}
 </head>
-<body{% if travelMap %} class="travel-page"{% endif %}>
+<body{% if travelMap %} class="travel-page"{% elif videoLibrary %} class="video-library-page"{% endif %}>
   <a class="skip-link" href="#main">跳到正文</a>
   <header class="header">
     <nav class="topnav" aria-label="主导航">

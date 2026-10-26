@@ -76,3 +76,9 @@ Twikoo 的内置管理入口使用管理员密码，不能等同于两个人各�
 - https://twikoo.js.org/frontend.html
 - https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/
 - https://www.netlify.com/pricing/
+
+## 留言输入项
+
+当前博客前端仅显示昵称与留言正文，邮箱和网址输入组通过 styles/style.css 中限定在评论区内的样式隐藏，回复表单同样生效。此处没有删除历史留言或修改后台管理员的邮件配置。现有后台的 REQUIRED_FIELDS 保持 nick，邮箱和网址不必填。
+
+若以后重新配置 Twikoo 后台，可将 DISPLAYED_FIELDS 与 REQUIRED_FIELDS 都设为 nick，组件会直接只渲染昵称；不要将已隐藏的邮箱或网址设为必填。当前样式适配固定的 Twikoo 2.0.17，按输入框 name（nick/mail/link）定位，不影响管理面板里的邮件通知设置。

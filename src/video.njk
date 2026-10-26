@@ -1,10 +1,52 @@
 ---
 layout: base.njk
 title: 视频
-heading: 视频
-subtitle: 把值得分享的画面，收藏在这里。
+heading: 让回忆，再播放一次
+subtitle: 留下声音，留下光，也留下我们在一起的片刻。
 navKey: videos
 permalink: /video.html
+wide: true
+videoLibrary: true
 ---
-<section class="card section-intro"><p class="eyebrow">FRAMES & MOMENTS</p><h2>视频记录</h2><p>共 {{ collections.videos.length }} 段视频。</p></section>
-{% for entry in collections.videos %}{% include 'card.njk' %}{% else %}<section class="card empty-state"><h2>这里还没有视频</h2><p>新的视频整理好后，会出现在这里。</p><a class="button" href="page.html">先去读一篇文章</a></section>{% endfor %}
+<section class="video-intro">
+  <div><p class="eyebrow">OUR LITTLE CINEMA / 影像手记</p><h2>把日子，剪成喜欢的模样。</h2><p>旅行的风声，平常的笑声，还有那些想反复回看的瞬间。</p></div>
+  <div class="video-total"><strong>{{ collections.videos.length }}</strong><span>段影像记录</span></div>
+</section>
+{% if collections.videos.length %}
+<section class="video-shelf" aria-labelledby="video-shelf-title">
+  <div class="video-section-heading"><div><p class="eyebrow">THE FILM COLLECTION</p><h2 id="video-shelf-title">我们的放映室</h2></div><p id="video-results" role="status">共 {{ collections.videos.length }} 段影像</p></div>
+  <form class="video-filters" id="video-filters" hidden role="search" aria-label="筛选影像">
+    <div class="video-search-field"><label for="video-search">搜索影像</label><input id="video-search" type="search" placeholder="输入标题、地点或关键词…"></div>
+    <div><label for="video-category">影像分类</label><select id="video-category"><option value="">全部分类</option></select></div>
+    <div><label for="video-year">记录年份</label><select id="video-year"><option value="">全部年份</option></select></div>
+    <div><label for="video-sort">排列顺序</label><select id="video-sort"><option value="newest">最新在前</option><option value="oldest">最早在前</option></select></div>
+    <button type="button" id="video-reset">重置</button>
+  </form>
+  <div class="video-grid" id="video-grid">
+  {% for entry in collections.videos %}
+    <article class="video-card" data-video-card data-title="{{ entry.data.title }}" data-summary="{{ entry.data.description }}" data-author="{{ entry.data.author }}" data-place="{{ entry.data.location.name or entry.data.place }}" data-category="{{ entry.data.videoCategory or entry.data.category or '影像' }}" data-year="{{ entry.date | yearOfDate }}" data-date="{{ entry.date | isoDate }}"{% if entry.data.videoUrl %} data-video-url="{{ entry.data.videoUrl | relativeUrl(page.url) }}"{% endif %}{% if entry.data.cover %} data-poster="{{ entry.data.cover | relativeUrl(page.url) }}"{% endif %}{% if entry.data.captionsUrl %} data-captions="{{ entry.data.captionsUrl | relativeUrl(page.url) }}"{% endif %}>
+      <div class="video-thumbnail">
+        <a class="video-cover-link" href="{{ entry.url | relativeUrl(page.url) }}" aria-label="查看影像：{{ entry.data.title }}">
+          {% if entry.data.cover %}<img src="{{ entry.data.cover | relativeUrl(page.url) }}" alt="{{ entry.data.coverAlt or entry.data.title }}" width="{{ entry.data.coverWidth or 1280 }}" height="{{ entry.data.coverHeight or 720 }}" loading="lazy">{% else %}<span class="video-cover-art" aria-hidden="true"><span class="video-frame-mark">▶</span><span>FRAGMENTS OF OUR DAYS</span></span>{% endif %}
+        </a>
+        {% if entry.data.videoUrl %}<button class="video-play" type="button" data-video-play aria-label="播放：{{ entry.data.title }}" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 11 7-11 7z"/></svg></button>{% else %}<span class="video-pending">影像整理中</span>{% endif %}
+        {% if entry.data.duration %}<span class="video-duration">{{ entry.data.duration }}</span>{% endif %}
+      </div>
+      <div class="video-card-body"><div class="video-card-meta"><span>{{ entry.data.videoCategory or entry.data.category or '影像' }}</span><time datetime="{{ entry.date | isoDate }}">{{ entry.date | displayDate }}</time></div><h3><a data-video-detail href="{{ entry.url | relativeUrl(page.url) }}">{{ entry.data.title }}</a></h3><p>{{ entry.data.description }}</p><div class="video-card-footer"><span>{{ entry.data.author }}{% if entry.data.place %} · {{ entry.data.place }}{% elif entry.data.location.name %} · {{ entry.data.location.name }}{% endif %}</span><a href="{{ entry.url | relativeUrl(page.url) }}">影像手记 ↗</a></div></div>
+    </article>
+  {% endfor %}
+  </div>
+  <div class="video-no-results" id="video-no-results" hidden><h3>暂时没有找到这段回忆</h3><p>换个关键词，或重置筛选再看看。</p><button type="button" data-video-reset>查看全部影像</button></div>
+</section>
+<dialog class="video-dialog" id="video-dialog" aria-labelledby="video-dialog-title">
+  <div class="video-dialog-heading"><div><p class="eyebrow">NOW SHOWING</p><h2 id="video-dialog-title">正在播放</h2></div><button type="button" id="video-dialog-close" autofocus aria-label="关闭播放器">关闭 ×</button></div>
+  <section class="video-watch" data-video-player aria-label="视频播放器"><video controls playsinline preload="none" aria-label="当前视频"></video><p class="video-playback-status" data-playback-status role="status" hidden></p><div class="video-watch-links"><button type="button" data-video-retry hidden>重新加载</button><a id="video-original" target="_blank" rel="noopener">打开视频文件 ↗</a></div></section>
+  <div class="video-dialog-footer"><p id="video-dialog-summary"></p><a id="video-dialog-detail">阅读完整手记 →</a></div>
+</dialog>
+{% else %}
+<section class="video-empty" aria-labelledby="video-empty-title">
+  <div class="video-empty-screen" aria-hidden="true"><span class="video-screen-corner video-screen-corner-start"></span><span class="video-screen-label">A MOMENT TO REMEMBER</span><svg class="video-clapper" viewBox="0 0 120 100" fill="none"><rect x="15" y="30" width="90" height="60" rx="6" stroke="currentColor" stroke-width="2"/><path d="m15 30-3-17 88-12 3 17-88 12Z" stroke="currentColor" stroke-width="2"/><path d="m31 11 12 16m11-19 12 16M77 5l12 16M16 46h88" stroke="currentColor" stroke-width="2"/><path d="m53 57 18 11-18 11V57Z" fill="currentColor"/></svg><span class="video-screen-caption">我们的小小放映室</span><span class="video-screen-corner video-screen-corner-end"></span></div>
+  <div class="video-empty-copy"><p class="eyebrow">THE FIRST FRAME IS ON ITS WAY</p><h2 id="video-empty-title">下一次相遇，<br>让回忆有声有色。</h2><p>这里还没有发布的影像。等视频整理好，旅行的风景与日常的片刻，就能在这里慢慢重播。</p><a class="video-primary-link" href="travel.html">先去看看旅行足迹 <span aria-hidden="true">↗</span></a><a class="video-secondary-link" href="page.html">读一篇日常记录 →</a></div>
+</section>
+{% endif %}
+<section class="video-bottom-note"><p class="eyebrow">LIFE, FRAME BY FRAME</p><p>有些时刻适合写下来，有些时刻，值得再看一遍。</p><a href="travel.html">沿着地图，寻找故事 →</a></section>
