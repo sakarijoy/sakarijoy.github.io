@@ -28,8 +28,9 @@ export async function addVideo(options, root = projectRoot, contentRoot) {
   if (!['.mp4', '.webm', '.ogv'].includes(extension)) throw new Error('请选择 MP4、WebM 或 OGV 视频文件。');
   const info = await stat(source).catch(() => null);
   if (!info?.isFile() || !info.size) throw new Error('视频文件不存在或为空：' + options.file);
-  const entries = resolve(contentRoot || await contentDirectory(root), 'videos');
-  const media = resolve(root, 'media');
+  const content = contentRoot || await contentDirectory(root);
+  const entries = resolve(content, 'videos');
+  const media = resolve(content, 'media');
   const entryPath = resolve(entries, options.slug + '.md');
   if (await stat(entryPath).catch(() => null)) throw new Error('同名视频介绍已存在，请更换 --slug 或直接编辑原文件。');
   const mediaRelative = relative(media, source);
@@ -57,7 +58,7 @@ export async function addVideo(options, root = projectRoot, contentRoot) {
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   if (process.argv.includes('--help')) {
-    console.log('npm run video:add -- --file "media/视频.mp4" --slug my-film --title "视频标题" --date 2026-10-26 [--category "影像记录"] [--place "地点"] [--duration "00:06"] [--publish]');
+    console.log('npm run video:add -- --file "../sakarijoy-blog-content/media/视频.mp4" --slug my-film --title "视频标题" --date 2026-10-27 [--category "影像记录"] [--place "地点"] [--duration "00:06"] [--publish]');
     console.log('默认生成草稿；--publish 让记录进入本地列表。命令不会执行 Git 提交或上传。');
   } else {
     try {

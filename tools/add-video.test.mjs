@@ -7,19 +7,20 @@ import { addVideo, parseArguments } from './add-video.mjs';
 async function workspace(t) {
   const root = await mkdtemp(join(tmpdir(), 'video-import-'));
   t.after(() => rm(root, { recursive: true, force: true }));
-  await mkdir(join(root, 'media'));
+  await mkdir(join(root, 'content/media'), { recursive: true });
   await writeFile(join(root, 'content-source.json'), JSON.stringify({ repository: 'test/content', branch: 'main', localDirectory: 'content' }));
-  await writeFile(join(root, 'media/轨道.mp4'), 'test-media-bytes');
+  await writeFile(join(root, 'content/media/轨道.mp4'), 'test-media-bytes');
   return root;
 }
-const fields = { file: 'media/轨道.mp4', slug: 'guidao', title: '轨道', date: '2026-10-26' };
+const fields = { file: 'content/media/轨道.mp4', slug: 'guidao', title: '轨道', date: '2026-10-26' };
 test('Chinese filenames in media remain intact and generate a draft by default', async t => {
   const root = await workspace(t);
   const result = await addVideo(fields, root);
   assert.equal(result.videoUrl, '/media/轨道.mp4'); assert.equal(result.published, false);
   const entry = await readFile(result.entryPath, 'utf8');
   assert.match(entry, /draft: true/); assert.match(entry, /title: "轨道"/);
-  assert.equal(await readFile(join(root, 'media/轨道.mp4'), 'utf8'), 'test-media-bytes');
+  assert.equal(await readFile(join(root, 'content/media/轨道.mp4'), 'utf8'), 'test-media-bytes');
+  await assert.rejects(stat(join(root, 'media')));
 });
 test('publishing is explicit and duplicate entries do not overwrite content', async t => {
   const root = await workspace(t);
@@ -34,9 +35,10 @@ test('external local video is copied and source retained; existing media is prot
   const result = await addVideo({ ...fields, file: 'source.mp4' }, root);
   assert.equal(result.videoUrl, '/media/guidao.mp4');
   assert.equal(await readFile(join(root, 'source.mp4'), 'utf8'), 'original');
-  await writeFile(join(root, 'media/taken.mp4'), 'keep');
+  assert.equal(await readFile(join(root, 'content/media/guidao.mp4'), 'utf8'), 'original');
+  await writeFile(join(root, 'content/media/taken.mp4'), 'keep');
   await assert.rejects(addVideo({ ...fields, file: 'source.mp4', slug: 'taken' }, root), /EEXIST/);
-  assert.equal(await readFile(join(root, 'media/taken.mp4'), 'utf8'), 'keep');
+  assert.equal(await readFile(join(root, 'content/media/taken.mp4'), 'utf8'), 'keep');
 });
 test('invalid dates, unsafe slugs and missing or unsupported files are rejected', async t => {
   const root = await workspace(t);

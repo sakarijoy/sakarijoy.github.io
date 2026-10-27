@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { channels, prepareContent, checkContentOutput, parseArticle } from './private-content.mjs';
@@ -82,4 +82,52 @@ test('output must exactly match published routes and never include Markdown, pri
   }
   await mkdir(join(root, '_site/.git'));
   await assert.rejects(checkContentOutput(root), /拒绝部署/);
+});
+
+const video = (url, draft = false, captions) => article(draft).replace('draft:', 'videoUrl: ' + JSON.stringify(url) + '\n' + (captions ? 'captionsUrl: ' + JSON.stringify(captions) + '\n' : '') + 'draft:');
+
+test('only media referenced by published records is staged; draft-only and unreferenced videos stay private', async t => {
+  const { root, source } = await workspace(t);
+  await mkdir(join(source, 'media/2026'), { recursive: true });
+  await writeFile(join(source, 'media/2026/轨道.mp4'), 'published-bytes');
+  await writeFile(join(source, 'media/2026/subtitles.vtt'), 'WEBVTT\n');
+  await writeFile(join(source, 'media/private.mp4'), 'PRIVATE_VIDEO');
+  await writeFile(join(source, 'media/unreferenced.mp4'), 'UNREFERENCED_VIDEO');
+  await writeFile(join(source, 'videos/live.md'), video('/media/2026/%E8%BD%A8%E9%81%93.mp4', false, '/media/2026/subtitles.vtt'));
+  await writeFile(join(source, 'videos/draft.md'), video('/media/private.mp4', true));
+  await prepareContent({ root, source });
+  assert.deepEqual(await readdir(join(root, '.content-build/public-media')), ['2026']);
+  assert.equal(await readFile(join(root, '.content-build/public-media/2026/轨道.mp4'), 'utf8'), 'published-bytes');
+  await mkdir(join(root, '_site/videos'), { recursive: true });
+  await writeFile(join(root, '_site/videos/live.html'), '<h1>live</h1>');
+  await cp(join(root, '.content-build/public-media'), join(root, '_site/media'), { recursive: true });
+  assert.equal(await checkContentOutput(root), 1);
+  await writeFile(join(root, '_site/media/private.mp4'), 'PRIVATE_VIDEO');
+  await assert.rejects(checkContentOutput(root), /媒体输出/);
+});
+
+test('unpublishing removes staged video and captions; a shared file stays public while another publication needs it', async t => {
+  const { root, source } = await workspace(t);
+  await mkdir(join(source, 'media'));
+  await writeFile(join(source, 'media/film.mp4'), 'video');
+  await writeFile(join(source, 'media/film.vtt'), 'WEBVTT');
+  for (const name of ['first', 'second']) await writeFile(join(source, 'videos', name + '.md'), video('/media/film.mp4', false, '/media/film.vtt'));
+  await prepareContent({ root, source });
+  await writeFile(join(source, 'videos/first.md'), video('/media/film.mp4', true));
+  await prepareContent({ root, source });
+  assert.equal((await readdir(join(root, '.content-build/public-media'))).length, 2);
+  await writeFile(join(source, 'videos/second.md'), video('/media/film.mp4', true));
+  await prepareContent({ root, source });
+  assert.deepEqual(await readdir(join(root, '.content-build/public-media')), []);
+});
+
+test('missing or unsafe local video fails before changing the last successful import; external HTTPS needs no copy', async t => {
+  const { root, source } = await workspace(t);
+  await writeFile(join(source, 'videos/live.md'), video('https://example.com/film.mp4'));
+  await prepareContent({ root, source });
+  for (const url of ['/media/missing.mp4', '/media/%2e%2e/secret.mp4', '/media/%5csecret.mp4', '/media/film.mp4?token=x', '/media/private.pem']) {
+    await writeFile(join(source, 'videos/live.md'), video(url));
+    await assert.rejects(prepareContent({ root, source }));
+    assert.match(await readFile(join(root, 'src/videos/live.md'), 'utf8'), /https:\/\/example.com/);
+  }
 });

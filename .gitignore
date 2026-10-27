@@ -8,3 +8,4 @@ _site/
 src/posts/*.md
 src/travel/*.md
 src/videos/*.md
+media/

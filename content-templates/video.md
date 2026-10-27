@@ -18,7 +18,7 @@ draft: true
 
 <!--
 使用方法：
-1. 把 MP4 放到项目的 media/ 文件夹。
+1. 把 MP4 放到私有内容仓库的 media/ 文件夹。
 2. 复制本文件到私有文章仓库 videos/，改名为 my-video.md。
 3. 修改上面的标题、日期、简介和 videoUrl。路径中的文件名必须与 MP4 一致。
 4. 写好正文，将 draft 改为 false，保存即可显示。

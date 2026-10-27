@@ -1,0 +1,18 @@
+{
+  "files.exclude": {
+    "src/posts/*.md": true,
+    "src/travel/*.md": true,
+    "src/videos/*.md": true,
+    ".content-build": true,
+    ".private-content": true,
+    "_site": true
+  },
+  "search.exclude": {
+    "src/posts/*.md": true,
+    "src/travel/*.md": true,
+    "src/videos/*.md": true,
+    ".content-build/**": true,
+    ".private-content/**": true,
+    "_site/**": true
+  }
+}

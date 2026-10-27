@@ -1,5 +1,5 @@
-import { lstat, mkdir, readFile, readdir, realpath, unlink, writeFile } from 'node:fs/promises';
-import { dirname, resolve, sep } from 'node:path';
+import { copyFile, lstat, mkdir, readFile, readdir, realpath, rm, unlink, writeFile } from 'node:fs/promises';
+import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
 import { contentProblems } from './content.mjs';
@@ -50,10 +50,39 @@ export async function readContent(source) {
       if ((await lstat(file)).size > 4 * 1024 * 1024) throw new Error(label + '：Markdown 超过 4 MB，请将大文件放在独立媒体存储。');
       const body = await readFile(file, 'utf8');
       const data = parseArticle(body, label);
-      articles.push({ channel, name: item.name, body, draft: data.draft });
+      articles.push({ channel, name: item.name, body, data, draft: data.draft });
     }
   }
   return articles;
+}
+
+export async function publishedMedia(source, articles) {
+  const files = new Map();
+  for (const article of articles.filter(article => !article.draft)) {
+    for (const field of ['videoUrl', 'captionsUrl']) {
+      const value = article.data[field];
+      if (!value || !value.startsWith('/media/')) continue;
+      let name;
+      try { name = decodeURIComponent(value.slice('/media/'.length)); }
+      catch { throw new Error('media 地址编码无效。'); }
+      const parts = name.split('/');
+      const extensions = field === 'captionsUrl' ? ['.vtt'] : ['.mp4', '.webm', '.ogv'];
+      if (parts.some(part => !part || part === '.' || part === '..' || /[\\\u0000-\u001f:?#]/.test(part)) || !extensions.includes(extname(name).toLowerCase())) throw new Error('media 地址需指向私有内容库内的视频或 VTT 字幕，不可包含参数、锚点或路径跳转。');
+      let file = resolve(source);
+      for (const part of ['media', ...parts]) {
+        file = resolve(file, part);
+        const info = await lstat(file).catch(() => null);
+        if (!info || info.isSymbolicLink() || await realpath(file) !== file) throw new Error('已发布视频或字幕在私有内容库 media 中不存在，或使用了符号链接。');
+      }
+      const info = await lstat(file);
+      if (!info.isFile() || !info.size) throw new Error('已发布视频或字幕必须是非空普通文件。');
+      const identity = name.normalize('NFKC').toLowerCase();
+      const previous = files.get(identity);
+      if (previous && previous.name !== name) throw new Error('media 中存在大小写或字符规范化后重名的发布文件。');
+      files.set(identity, { name, file, size: info.size });
+    }
+  }
+  return [...files.values()];
 }
 
 export async function prepareContent({ root = projectRoot, source, env = process.env } = {}) {
@@ -61,6 +90,24 @@ export async function prepareContent({ root = projectRoot, source, env = process
   if (source === root || source.startsWith(resolve(root, 'src') + sep) || source.startsWith(resolve(root, '_site') + sep)) throw new Error('内容源必须与网站输入和输出目录分离。');
   // Validate the complete source before replacing any previously imported files.
   const articles = await readContent(source);
+  const media = await publishedMedia(source, articles);
+  const buildRoot = resolve(root, '.content-build');
+  await mkdir(buildRoot, { recursive: true });
+  await plainDirectory(buildRoot);
+  const mediaStage = resolve(buildRoot, 'public-media');
+  const previousStage = await lstat(mediaStage).catch(error => { if (error.code === 'ENOENT') return null; throw error; });
+  if (previousStage) {
+    await plainDirectory(mediaStage);
+    if (dirname(mediaStage) !== buildRoot) throw new Error('Unexpected media staging path');
+    await rm(mediaStage, { recursive: true });
+  }
+  await mkdir(mediaStage);
+  for (const item of media) {
+    const destination = resolve(mediaStage, item.name);
+    if (!destination.startsWith(mediaStage + sep)) throw new Error('Unexpected media destination');
+    await mkdir(dirname(destination), { recursive: true });
+    await copyFile(item.file, destination);
+  }
   for (const channel of channels) {
     const folder = resolve(root, 'src', channel);
     await plainDirectory(folder);
@@ -74,7 +121,8 @@ export async function prepareContent({ root = projectRoot, source, env = process
   for (const article of published) await writeFile(resolve(root, 'src', article.channel, article.name), article.body, 'utf8');
   const manifest = {
     published: published.map(article => article.channel + '/' + article.name.replace(/\.md$/, '.html')),
-    drafts: articles.filter(article => article.draft).map(article => article.channel + '/' + article.name.replace(/\.md$/, '.html'))
+    drafts: articles.filter(article => article.draft).map(article => article.channel + '/' + article.name.replace(/\.md$/, '.html')),
+    media: media.map(item => ({ path: 'media/' + item.name, size: item.size }))
   };
   await mkdir(resolve(root, '.content-build'), { recursive: true });
   await writeFile(resolve(root, '.content-build/manifest.json'), JSON.stringify(manifest), 'utf8');
@@ -94,6 +142,20 @@ export async function checkContentOutput(root = projectRoot) {
     }
   }
   if (expected.size !== generated.size || [...generated].some(name => !expected.has(name))) throw new Error('内容输出与已发布清单不一致，拒绝部署。');
+  const expectedMedia = new Map(manifest.media.map(item => [item.path, item.size]));
+  const generatedMedia = new Map();
+  async function inspectMedia(folder, prefix = 'media') {
+    const items = await readdir(folder, { withFileTypes: true }).catch(error => { if (error.code === 'ENOENT') return []; throw error; });
+    for (const item of items) {
+      if (item.isSymbolicLink()) throw new Error('发布媒体不能包含符号链接。');
+      const file = resolve(folder, item.name), name = prefix + '/' + item.name;
+      if (item.isDirectory()) await inspectMedia(file, name);
+      else if (item.isFile()) generatedMedia.set(name, (await lstat(file)).size);
+      else throw new Error('发布媒体必须是普通文件。');
+    }
+  }
+  await inspectMedia(resolve(root, '_site/media'));
+  if (expectedMedia.size !== generatedMedia.size || [...generatedMedia].some(([name, size]) => expectedMedia.get(name) !== size)) throw new Error('媒体输出与已发布视频清单不一致，拒绝部署。');
   // Nothing from the private checkout, including its Git metadata, may be uploaded.
   async function inspect(folder) {
     for (const item of await readdir(folder, { withFileTypes: true })) {
