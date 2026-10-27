@@ -3,6 +3,7 @@ import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
 import { contentProblems } from './content.mjs';
+import { publishedImages } from './private-images.mjs';
 
 export const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const channels = ['posts', 'travel', 'videos'];
@@ -91,22 +92,25 @@ export async function prepareContent({ root = projectRoot, source, env = process
   // Validate the complete source before replacing any previously imported files.
   const articles = await readContent(source);
   const media = await publishedMedia(source, articles);
+  const images = await publishedImages(source, articles, root);
   const buildRoot = resolve(root, '.content-build');
   await mkdir(buildRoot, { recursive: true });
   await plainDirectory(buildRoot);
-  const mediaStage = resolve(buildRoot, 'public-media');
-  const previousStage = await lstat(mediaStage).catch(error => { if (error.code === 'ENOENT') return null; throw error; });
-  if (previousStage) {
-    await plainDirectory(mediaStage);
-    if (dirname(mediaStage) !== buildRoot) throw new Error('Unexpected media staging path');
-    await rm(mediaStage, { recursive: true });
-  }
-  await mkdir(mediaStage);
-  for (const item of media) {
-    const destination = resolve(mediaStage, item.name);
-    if (!destination.startsWith(mediaStage + sep)) throw new Error('Unexpected media destination');
-    await mkdir(dirname(destination), { recursive: true });
-    await copyFile(item.file, destination);
+  for (const [name, files] of [['public-media', media], ['public-images', images]]) {
+    const stage = resolve(buildRoot, name);
+    const previousStage = await lstat(stage).catch(error => { if (error.code === 'ENOENT') return null; throw error; });
+    if (previousStage) {
+      await plainDirectory(stage);
+      if (dirname(stage) !== buildRoot) throw new Error('Unexpected asset staging path');
+      await rm(stage, { recursive: true });
+    }
+    await mkdir(stage);
+    for (const item of files) {
+      const destination = resolve(stage, item.name);
+      if (!destination.startsWith(stage + sep)) throw new Error('Unexpected asset destination');
+      await mkdir(dirname(destination), { recursive: true });
+      await copyFile(item.file, destination);
+    }
   }
   for (const channel of channels) {
     const folder = resolve(root, 'src', channel);
@@ -122,7 +126,8 @@ export async function prepareContent({ root = projectRoot, source, env = process
   const manifest = {
     published: published.map(article => article.channel + '/' + article.name.replace(/\.md$/, '.html')),
     drafts: articles.filter(article => article.draft).map(article => article.channel + '/' + article.name.replace(/\.md$/, '.html')),
-    media: media.map(item => ({ path: 'media/' + item.name, size: item.size }))
+    media: media.map(item => ({ path: 'media/' + item.name, size: item.size })),
+    images: images.map(item => ({ path: 'images/' + item.name, size: item.size }))
   };
   await mkdir(resolve(root, '.content-build'), { recursive: true });
   await writeFile(resolve(root, '.content-build/manifest.json'), JSON.stringify(manifest), 'utf8');
@@ -142,20 +147,22 @@ export async function checkContentOutput(root = projectRoot) {
     }
   }
   if (expected.size !== generated.size || [...generated].some(name => !expected.has(name))) throw new Error('内容输出与已发布清单不一致，拒绝部署。');
-  const expectedMedia = new Map(manifest.media.map(item => [item.path, item.size]));
-  const generatedMedia = new Map();
-  async function inspectMedia(folder, prefix = 'media') {
+  async function inspectAssets(folder, prefix, files) {
     const items = await readdir(folder, { withFileTypes: true }).catch(error => { if (error.code === 'ENOENT') return []; throw error; });
     for (const item of items) {
       if (item.isSymbolicLink()) throw new Error('发布媒体不能包含符号链接。');
       const file = resolve(folder, item.name), name = prefix + '/' + item.name;
-      if (item.isDirectory()) await inspectMedia(file, name);
-      else if (item.isFile()) generatedMedia.set(name, (await lstat(file)).size);
+      if (item.isDirectory()) await inspectAssets(file, name, files);
+      else if (item.isFile()) files.set(name, (await lstat(file)).size);
       else throw new Error('发布媒体必须是普通文件。');
     }
   }
-  await inspectMedia(resolve(root, '_site/media'));
-  if (expectedMedia.size !== generatedMedia.size || [...generatedMedia].some(([name, size]) => expectedMedia.get(name) !== size)) throw new Error('媒体输出与已发布视频清单不一致，拒绝部署。');
+  for (const kind of ['media', 'images']) {
+    const expectedFiles = new Map(manifest[kind].map(item => [item.path, item.size]));
+    const generatedFiles = new Map();
+    await inspectAssets(resolve(root, '_site', kind), kind, generatedFiles);
+    if (expectedFiles.size !== generatedFiles.size || [...generatedFiles].some(([name, size]) => expectedFiles.get(name) !== size)) throw new Error((kind === 'images' ? '图片输出' : '媒体输出') + '与发布清单不一致，拒绝部署。');
+  }
   // Nothing from the private checkout, including its Git metadata, may be uploaded.
   async function inspect(folder) {
     for (const item of await readdir(folder, { withFileTypes: true })) {

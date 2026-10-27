@@ -4,7 +4,7 @@
 
 生成方式：内置 imagegen。图片是照片质感的通用桌游场景，不是当日实拍。
 
-最终图片：images/first-board-game.webp
+最终图片：私有内容库 images/first-board-game.webp
 
 ## 最终提示词
 

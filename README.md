@@ -20,6 +20,7 @@ Developing/
     travel/                 游记
     videos/                 视频介绍
     media/                  视频与 VTT 字幕
+    images/                 配图、封面与头像
     content-templates/      写作模板
 ```
 
@@ -81,9 +82,9 @@ npm run content:sync  # 仅同步已发布 MD，不生成网页
 
 ## 媒体与站点资料
 
-- 图片、头像、封面仍放网站 `images/`。封面同时填写 `coverAlt`、`coverWidth`、`coverHeight`。
+- 图片、头像、封面放私有内容库 `images/`，网页路径仍写 `/images/...`。封面同时填写 `coverAlt`、`coverWidth`、`coverHeight`。
 - 视频文件放在私有内容库 `media/`，介绍放 `videos/`。`videoUrl` 仍写 `/media/轨道.mp4` 这样的博客地址；构建自动复制已发布记录引用的视频和字幕。NAS 接入未启用。
-- 网站代码库的 `images/` 仍是公开资源目录。私有库 `media/` 的草稿专用和未引用视频不会发布；已发布记录引用的视频会公开播放。
+- 固定图片、头像和已发布文章引用的配图会公开显示；草稿专用和未引用的图片、视频不会发布。模板或 CSS 新增固定图片时，在网站 `site-assets.json` 中登记路径。
 - 网站资料在 `src/_data/site.json`；评论配置在 `src/_data/commentService.json`；公共模板在 `src/_includes/`。
 
 私有源文件不等于已发布正文私有。公开仓库的历史版本仍可能含有旧文章，此次没有重写历史。
@@ -94,5 +95,6 @@ npm run content:sync  # 仅同步已发布 MD，不生成网页
 - [网站架构](docs/architecture.md)
 - [旅行地图](docs/travel-map.md)
 - [视频写作](docs/video-page.md)
+- [图片与封面](docs/images.md)
 - [评论配置](docs/comments-setup.md)
 - [双人后台后续安排](docs/shared-blog-plan.md)

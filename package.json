@@ -16,10 +16,12 @@
     "video:add": "node tools/add-video.mjs",
     "test:architecture": "node --test tools/content.test.mjs tools/search.test.mjs",
     "content:sync": "node tools/prepare-content.mjs",
-    "test:private-content": "node --test tools/private-content.test.mjs"
+    "test:private-content": "node --test tools/private-content.test.mjs tools/private-images.test.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.7",
-    "js-yaml": "4.3.2"
+    "js-yaml": "4.3.2",
+    "markdown-it": "14.3.3",
+    "htmlparser2": "7.2.0"
   }
 }

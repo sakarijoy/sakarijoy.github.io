@@ -29,13 +29,13 @@ function changed(_event, filename = '') {
   clearTimeout(timer);
   timer = setTimeout(() => { void build(); }, 250);
 }
-for (const folder of ['src', 'styles', 'scripts', 'images', 'tools']) watchers.push(watch(resolve(projectRoot, folder), { recursive: true }, changed));
+for (const folder of ['src', 'styles', 'scripts', 'tools']) watchers.push(watch(resolve(projectRoot, folder), { recursive: true }, changed));
 watchers.push(watch(source, { recursive: true }, (event, name = '') => {
   const filename = String(name).replaceAll('\\', '/');
-  if (!/^(?:posts|travel|videos|media)(?:\/|$)/.test(filename)) return;
+  if (!/^(?:posts|travel|videos|media|images)(?:\/|$)/.test(filename)) return;
   clearTimeout(timer); timer = setTimeout(() => { void build(); }, 250);
 }));
-for (const file of ['eleventy.config.js', 'content-source.json']) watchers.push(watch(resolve(projectRoot, file), changed));
+for (const file of ['eleventy.config.js', 'content-source.json', 'site-assets.json']) watchers.push(watch(resolve(projectRoot, file), changed));
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
   stopping = true; clearTimeout(timer);
   watchers.forEach(watcher => watcher.close());

@@ -1,6 +1,6 @@
 # 旅行地图与文件分析
 
-当前项目使用 Eleventy 3 生成静态博客，src 是页面模板与临时构建输入，styles 和 scripts 是样式与交互，images 是图片。src/travel.njk 是旅行首页，私有内容库 travel/ 下的 Markdown 是游记，content-templates/travel.md 是写作模板。地图根据已发布游记中的经纬度显示点位，不根据配图或普通文章猜测地点。私有内容配置见 [说明](private-content.md)。
+当前项目使用 Eleventy 3 生成静态博客，src 是页面模板与临时构建输入，styles 和 scripts 是样式与交互，图片源文件保存在私有内容库 images/，博客地址保持 /images/...。src/travel.njk 是旅行首页，私有内容库 travel/ 下的 Markdown 是游记，content-templates/travel.md 是写作模板。地图根据已发布游记中的经纬度显示点位，不根据配图或普通文章猜测地点。私有内容配置见 [说明](private-content.md)。
 
 ## 添加真实地点
 

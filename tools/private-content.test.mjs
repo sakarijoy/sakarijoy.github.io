@@ -10,6 +10,9 @@ async function workspace(t) {
   const root = await mkdtemp(join(tmpdir(), 'private-content-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   const source = join(root, 'content');
+  await mkdir(join(root, 'src/_data'), { recursive: true });
+  await writeFile(join(root, 'src/_data/site.json'), JSON.stringify({ owners: [] }));
+  await writeFile(join(root, 'site-assets.json'), JSON.stringify({ images: [] }));
   for (const channel of channels) {
     await mkdir(join(source, channel), { recursive: true });
     await mkdir(join(root, 'src', channel), { recursive: true });
