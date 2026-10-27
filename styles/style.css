@@ -148,3 +148,12 @@ code { padding: 2px 5px; border-radius: 3px; background: #eef2f5; font-family: C
 .comments-section .tk-meta-input .tk-input:has(input[name="link"]) { display: none !important; }
 .comments-section .tk-meta-input .tk-input:has(input[name="nick"]) { flex: 1; width: 100%; margin: 0; }
 @media (max-width: 480px) { .comments-section { padding: 20px; } }
+
+/* Shared content discovery and chronological reading. */
+.search-kind { min-width: 180px; max-width: 100%; padding: 10px 12px; border: 1px solid #b8c7d2; border-radius: 4px; background: #fff; color: var(--ink); font: inherit; font-size: 14px; }
+.search-kind:focus-visible { outline: 3px solid #b46b13; outline-offset: 3px; }
+.search-result h2 { font-size: 22px; }.search-result h2 a { text-decoration: none; }.search-result p { font-size: 14px; color: var(--muted); }.search-result .post-meta { margin-top: 0; }
+.archive-year-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }.archive-year-heading h2 { margin: 0; }.archive-year-heading>span { font-size: 12px; color: var(--muted); }
+.archive-entries { list-style: none; margin: 0; padding: 0; }.archive-entries li { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 20px; padding: 18px 0; border-bottom: 1px solid #edf1f3; }.archive-entries li:last-child { border: 0; }.archive-entries time { color: var(--muted); font-size: 12px; padding-top: 2px; }.archive-entries a { font-size: 16px; text-decoration: none; }.archive-entries div>span { display: block; font-size: 12px; color: var(--muted); margin-top: 5px; }
+.entry-neighbors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }.entry-neighbors a { display: block; padding: 20px 24px; border: 1px solid var(--line); border-radius: 6px; background: #fff; text-decoration: none; }.entry-neighbors a>span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px; }.entry-neighbors strong { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }.entry-neighbors a:hover { border-color: #7a9f8d; }
+@media(max-width:480px) { .archive-entries li { grid-template-columns: minmax(0, 1fr); gap: 4px; }.entry-neighbors { grid-template-columns: minmax(0, 1fr); gap: 12px; } }

@@ -8,6 +8,7 @@ async function workspace(t) {
   const root = await mkdtemp(join(tmpdir(), 'video-import-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   await mkdir(join(root, 'media'));
+  await writeFile(join(root, 'content-source.json'), JSON.stringify({ repository: 'test/content', branch: 'main', localDirectory: 'content' }));
   await writeFile(join(root, 'media/轨道.mp4'), 'test-media-bytes');
   return root;
 }
@@ -40,7 +41,7 @@ test('external local video is copied and source retained; existing media is prot
 test('invalid dates, unsafe slugs and missing or unsupported files are rejected', async t => {
   const root = await workspace(t);
   for (const options of [{ date: '2026-02-30' }, { slug: '../escape' }, { file: 'missing.mp4' }, { file: 'notes.txt' }, { duration: '1:99' }]) await assert.rejects(addVideo({ ...fields, ...options }, root));
-  await assert.rejects(stat(join(root, 'src/videos/guidao.md')));
+  await assert.rejects(stat(join(root, 'content/videos/guidao.md')));
   assert.throws(() => parseArguments(['--file']), /缺少值/);
   assert.equal(parseArguments(['--publish']).publish, true);
 });

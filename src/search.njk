@@ -1,0 +1,24 @@
+---
+layout: base.njk
+title: 全站搜索
+heading: 找回一段记忆
+subtitle: 搜索文字、沿途的足迹，以及镜头里的故事。
+navKey: search
+permalink: /search.html
+wide: true
+search: true
+noindex: true
+---
+<section class="card section-intro"><p class="eyebrow">FIND A MEMORY</p><h2>全站搜索</h2><p>一起查找文章、游记和视频的标题、摘要、作者、分类与地点。</p>
+<form class="search-form" role="search" data-search-form data-search-unit="条记录" hidden>
+<label for="site-search">搜索关键词</label><div class="search-input-row"><input id="site-search" type="search" placeholder="例如：冲绳、轨道、相识…" data-search-input><button type="button" class="search-clear" data-search-clear hidden>清空</button></div>
+<label for="search-kind">内容类型</label><select id="search-kind" class="search-kind" data-search-type><option value="">全部记录</option><option value="article">文章</option><option value="travel">旅行</option><option value="video">视频</option></select>
+<p class="search-status" role="status" aria-live="polite" data-search-status></p></form></section>
+<div class="search-results">{% for entry in collections.published %}
+<article class="card search-result" data-search-card data-content-type="{{ entry.data.contentType }}" data-search-text="{{ entry.data.title }} {{ entry.data.description }} {{ entry.data.category }} {{ entry.data.author }} {{ entry.data.location.name }} {{ entry.data.place }} {{ entry.data.videoCategory }}">
+<div class="post-meta"><time datetime="{{ entry.date | isoDate }}">{{ entry.date | displayDate }}</time><span>{% if entry.data.contentType == 'travel' %}旅行{% elif entry.data.contentType == 'video' %}视频{% else %}文章{% endif %}</span><span>{{ entry.data.author }}</span></div>
+<h2><a href="{{ entry.url | relativeUrl(page.url) }}">{{ entry.data.title }}</a></h2><p>{{ entry.data.description }}</p></article>
+{% endfor %}</div>
+<section class="card empty-state" data-search-empty hidden><h2>没有找到相关记录</h2><p>试试其他关键词，或切换内容类型。</p></section>
+{% if not collections.published.length %}<section class="card empty-state"><h2>第一段记录正在准备中</h2><p>发布后，就能在这里搜索到了。</p></section>{% endif %}
+<noscript><p class="notice">开启 JavaScript 后可以筛选；上方列表可直接浏览和阅读。</p></noscript>

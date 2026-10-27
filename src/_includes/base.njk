@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="{{ description or site.description }}">
   <meta name="theme-color" content="#17283c">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title }} · RSS" href="{{ '/feed.xml' | absoluteUrl(site.url) }}">
+  {% if not noindex %}
+  <link rel="canonical" href="{{ page.url | absoluteUrl(site.url) }}">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:site_name" content="{{ site.title }}">
+  <meta property="og:title" content="{% if title %}{{ title }} · {% endif %}{{ site.title }}">
+  <meta property="og:description" content="{{ description or site.description }}">
+  <meta property="og:type" content="{% if contentType %}article{% else %}website{% endif %}">
+  <meta property="og:url" content="{{ page.url | absoluteUrl(site.url) }}">
+  <meta property="og:image" content="{{ (cover or '/images/header.webp') | absoluteUrl(site.url) }}">
+  <meta property="og:image:alt" content="{{ coverAlt or site.description }}">
+  <meta name="twitter:card" content="summary_large_image">
+  {% if contentType %}<meta property="article:published_time" content="{{ date | isoDate }}">{% endif %}
+  {% endif %}
   {% if noindex %}<meta name="robots" content="noindex">{% endif %}
   <title>{% if title %}{{ title }} · {% endif %}{{ site.title }}</title>
   <link rel="stylesheet" href="{% if noindex %}/styles/style.css{% else %}{{ '/styles/style.css' | relativeUrl(page.url) }}{% endif %}">
@@ -34,6 +48,6 @@
     <div class="leftcolumn">{{ content | safe }}</div>
     {% if not wide %}{% include 'sidebar.njk' %}{% endif %}
   </main>
-  <footer class="footer"><p>© {{ site.startYear }}–{{ '' | year }} <a href="{% if noindex %}/index.html{% else %}{{ '/index.html' | relativeUrl(page.url) }}{% endif %}">{{ site.title }}</a> · 一起记录</p><a href="{% if noindex %}/page.html{% else %}{{ '/page.html' | relativeUrl(page.url) }}{% endif %}">浏览文章</a></footer>
+  <footer class="footer"><p>© {{ site.startYear }}–{{ '' | year }} <a href="{% if noindex %}/index.html{% else %}{{ '/index.html' | relativeUrl(page.url) }}{% endif %}">{{ site.title }}</a> · 一起记录</p><a href="{% if noindex %}/page.html{% else %}{{ '/page.html' | relativeUrl(page.url) }}{% endif %}">浏览文章</a><a href="{% if noindex %}/archive.html{% else %}{{ '/archive.html' | relativeUrl(page.url) }}{% endif %}">年度归档</a><a href="{% if noindex %}/feed.xml{% else %}{{ '/feed.xml' | relativeUrl(page.url) }}{% endif %}">RSS 订阅</a></footer>
 </body>
 </html>

@@ -7,15 +7,19 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "node tools/clean.mjs && eleventy",
-    "dev": "node tools/clean.mjs && eleventy --serve --port=4173",
-    "check": "npm run build && node tools/check-site.mjs && npm run test:comments && npm run test:videos",
+    "build": "node tools/build.mjs",
+    "dev": "node tools/dev.mjs",
+    "check": "npm run build && node tools/check-site.mjs && node tools/check-discovery.mjs && npm run test:comments && npm run test:videos && npm run test:architecture && npm run test:private-content",
     "preview": "node tools/preview.mjs",
     "test:comments": "node --test tools/comments.test.mjs",
     "test:videos": "node --test tools/video.test.mjs tools/add-video.test.mjs",
-    "video:add": "node tools/add-video.mjs"
+    "video:add": "node tools/add-video.mjs",
+    "test:architecture": "node --test tools/content.test.mjs tools/search.test.mjs",
+    "content:sync": "node tools/prepare-content.mjs",
+    "test:private-content": "node --test tools/private-content.test.mjs"
   },
   "devDependencies": {
-    "@11ty/eleventy": "3.1.7"
+    "@11ty/eleventy": "3.1.7",
+    "js-yaml": "4.3.2"
   }
 }

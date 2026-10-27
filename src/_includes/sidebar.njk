@@ -11,5 +11,5 @@
   <section class="card"><h2 class="small-heading">最近更新</h2>
     {% for entry in collections.published | take(3) %}<a class="recent-post" href="{{ entry.url | relativeUrl(page.url) }}">{{ entry.data.title }}<span>{{ entry.date | isoDate }} · {{ entry.data.category }}</span></a>{% else %}<p>新的记录正在准备。</p>{% endfor %}
   </section>
-  <section class="card"><h2 class="small-heading">记录归档</h2><ul class="archive-links"><li><a href="{{ '/page.html' | relativeUrl(page.url) }}">文章<span>{{ collections.posts.length }}</span></a></li><li><a href="{{ '/video.html' | relativeUrl(page.url) }}">视频<span>{{ collections.videos.length }}</span></a></li><li><a href="{{ '/travel.html' | relativeUrl(page.url) }}">旅行<span>{{ collections.travel.length }}</span></a></li></ul></section>
+  <section class="card"><h2 class="small-heading">记录归档</h2><ul class="archive-links"><li><a href="{{ '/page.html' | relativeUrl(page.url) }}">文章<span>{{ collections.posts.length }}</span></a></li><li><a href="{{ '/video.html' | relativeUrl(page.url) }}">视频<span>{{ collections.videos.length }}</span></a></li><li><a href="{{ '/travel.html' | relativeUrl(page.url) }}">旅行<span>{{ collections.travel.length }}</span></a></li><li><a href="{{ '/archive.html' | relativeUrl(page.url) }}">按年份查看全部<span>→</span></a></li></ul></section>
 </aside>

@@ -1,0 +1,14 @@
+---
+layout: base.njk
+title: 记录归档
+heading: 日子有序，回忆有迹
+subtitle: 按年份翻一翻，我们一起留下的记录。
+permalink: /archive.html
+wide: true
+---
+<section class="card section-intro"><p class="eyebrow">THE MEMORY ARCHIVE</p><h2>记录归档</h2><p>共 {{ collections.published.length }} 条记录：{{ collections.posts.length }} 篇文章、{{ collections.travel.length }} 篇游记、{{ collections.videos.length }} 段影像。</p><a class="text-link" href="search.html">找一段具体的记忆 →</a></section>
+{% for group in collections.published | groupByYear %}
+<section class="card archive-year" aria-labelledby="year-{{ group.year }}"><div class="archive-year-heading"><h2 id="year-{{ group.year }}">{{ group.year }}</h2><span>{{ group.entries.length }} 条记录</span></div><ol class="archive-entries">
+{% for entry in group.entries %}<li><time datetime="{{ entry.date | isoDate }}">{{ entry.date | isoDate }}</time><div><a href="{{ entry.url | relativeUrl(page.url) }}">{{ entry.data.title }}</a><span>{% if entry.data.contentType == 'travel' %}旅行{% elif entry.data.contentType == 'video' %}视频{% else %}文章{% endif %} · {{ entry.data.category }}</span></div></li>{% endfor %}
+</ol></section>
+{% else %}<section class="card empty-state"><h2>还没有记录</h2><p>记录发布后，归档会自动更新。</p></section>{% endfor %}

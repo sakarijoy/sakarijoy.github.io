@@ -2,6 +2,7 @@ import { copyFile, mkdir, stat, writeFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { basename, dirname, extname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { contentDirectory } from './private-content.mjs';
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const valueFlags = new Set(['file', 'slug', 'title', 'date', 'author', 'category', 'place', 'description', 'duration']);
@@ -17,7 +18,7 @@ export function parseArguments(args) {
   }
   return options;
 }
-export async function addVideo(options, root = projectRoot) {
+export async function addVideo(options, root = projectRoot, contentRoot) {
   for (const key of ['file', 'slug', 'title', 'date']) if (!options[key]?.trim()) throw new Error('请填写 --' + key);
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(options.slug)) throw new Error('slug 请使用小写英文、数字和连字符，例如 guidao。');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(options.date) || !Number.isFinite(Date.parse(options.date)) || new Date(options.date).toISOString().slice(0, 10) !== options.date) throw new Error('日期必须有效，格式为 YYYY-MM-DD。');
@@ -27,7 +28,7 @@ export async function addVideo(options, root = projectRoot) {
   if (!['.mp4', '.webm', '.ogv'].includes(extension)) throw new Error('请选择 MP4、WebM 或 OGV 视频文件。');
   const info = await stat(source).catch(() => null);
   if (!info?.isFile() || !info.size) throw new Error('视频文件不存在或为空：' + options.file);
-  const entries = resolve(root, 'src/videos');
+  const entries = resolve(contentRoot || await contentDirectory(root), 'videos');
   const media = resolve(root, 'media');
   const entryPath = resolve(entries, options.slug + '.md');
   if (await stat(entryPath).catch(() => null)) throw new Error('同名视频介绍已存在，请更换 --slug 或直接编辑原文件。');

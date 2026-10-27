@@ -8,4 +8,11 @@ layout: base.njk
   <div class="article-body">{{ content | safe }}</div>
   <div class="article-end"><a class="text-link" href="{{ listingUrl | relativeUrl(page.url) }}">← 返回{{ listingLabel }}列表</a><a class="text-link" href="{{ '/index.html' | relativeUrl(page.url) }}">回到首页 ↑</a></div>
 </article>
+{% set neighbors = collections.published | entryNeighbors(page.url) %}
+{% if neighbors.previous or neighbors.next %}
+<nav class="entry-neighbors" aria-label="继续阅读">
+{% if neighbors.previous %}<a href="{{ neighbors.previous.url | relativeUrl(page.url) }}"><span>← 上一篇</span><strong>{{ neighbors.previous.data.title }}</strong></a>{% endif %}
+{% if neighbors.next %}<a href="{{ neighbors.next.url | relativeUrl(page.url) }}"><span>下一篇 →</span><strong>{{ neighbors.next.data.title }}</strong></a>{% endif %}
+</nav>
+{% endif %}
 {% include 'comments.njk' %}

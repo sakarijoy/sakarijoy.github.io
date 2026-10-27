@@ -1,10 +1,14 @@
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { validateCommentService } from './tools/comment-config.mjs';
+import { validateSite, selectPublished, absoluteUrl, indexablePages, groupByYear, entryNeighbors } from './tools/content.mjs';
 export default function (eleventyConfig) {
+  // Published Markdown is imported locally and intentionally excluded from Git.
+  eleventyConfig.setUseGitIgnore(false);
   eleventyConfig.on('eleventy.before', async () => {
     const config = JSON.parse(await readFile(new URL('./src/_data/commentService.json', import.meta.url), 'utf8'));
     validateCommentService(config);
+    validateSite(JSON.parse(await readFile(new URL('./src/_data/site.json', import.meta.url), 'utf8')));
   });
   eleventyConfig.addPassthroughCopy({ images: 'images', styles: 'styles', scripts: 'scripts', media: 'media', '.nojekyll': '.nojekyll' });
   eleventyConfig.addNunjucksFilter('relativeUrl', (target, from = '/index.html') => {
@@ -20,7 +24,12 @@ export default function (eleventyConfig) {
   eleventyConfig.addNunjucksFilter('take', (items, count) => items.slice(0, count));
   eleventyConfig.addNunjucksFilter('year', () => new Date().getFullYear());
   eleventyConfig.addNunjucksFilter('yearOfDate', value => new Date(value).getUTCFullYear());
-  const published = (items) => items.filter(entry => entry.data.draft !== true).sort((a, b) => b.date - a.date || a.url.localeCompare(b.url));
+  eleventyConfig.addNunjucksFilter('absoluteUrl', absoluteUrl);
+  eleventyConfig.addNunjucksFilter('rssDate', value => new Date(value).toUTCString());
+  eleventyConfig.addNunjucksFilter('groupByYear', groupByYear);
+  eleventyConfig.addNunjucksFilter('entryNeighbors', entryNeighbors);
+  eleventyConfig.addCollection('indexable', collection => indexablePages(collection.getAll()));
+  const published = selectPublished;
   eleventyConfig.addCollection('published', collection => published(collection.getFilteredByTag('entry')));
   for (const kind of ['posts', 'travel', 'videos']) {
     eleventyConfig.addCollection(kind, collection => published(collection.getFilteredByTag(kind)));

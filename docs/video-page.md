@@ -5,7 +5,7 @@
 ## 每次新增只做三件事
 
 1. **放视频**：将 MP4 放到项目的 media/ 文件夹，例如 media/我的视频.mp4。
-2. **复制模板**：复制 content-templates/video.md 到 src/videos/，改名为 my-video.md。建议介绍文件用小写英文命名，MP4 可以使用中文文件名。
+2. **复制模板**：复制 content-templates/video.md 到私有内容库 videos/，改名为 my-video.md。建议介绍文件用小写英文命名，MP4 可以使用中文文件名。
 3. **修改并保存**：填写标题、日期、简介、视频路径和正文，最后将 draft 改为 false。
 
 最小示例：
@@ -29,7 +29,7 @@ videoUrl 的文件名必须和实际视频一致。date 可以是拍摄日期；
 当前《轨道》就是完整示例：
 
 - 视频文件：media/轨道.mp4
-- 介绍文件：src/videos/guidao.md
+- 介绍文件：../sakarijoy-blog-content/videos/guidao.md
 - 视频路径：videoUrl: /media/轨道.mp4
 - 页面地址：/videos/guidao.html
 
@@ -57,9 +57,9 @@ captionsUrl: /media/my-video.zh.vtt
 适合当前这种少量小视频。项目已配置 media/ 随网站发布，不需要再配置目录。
 
 ```text
-src/posts/          文章 Markdown
-src/travel/         游记 Markdown
-src/videos/         视频介绍 Markdown
+../sakarijoy-blog-content/posts/   私有文章
+../sakarijoy-blog-content/travel/  私有游记
+../sakarijoy-blog-content/videos/  私有视频介绍
 images/             图片和视频封面
 media/              MP4、WebM 和字幕文件
 ```
@@ -74,6 +74,6 @@ media/ 是公开网站资源目录，里面的文件会随网站发布；draft �
 
 本地开发预览已经运行时，保存 Markdown 后刷新 /video.html 即可。若没有运行，在项目目录执行一次 npm run dev，并打开终端打印的地址。如果新增内容未出现，重启本地开发预览。
 
-上线前运行 npm run check，随后像文章一样把新增的 .md 和 MP4 一并提交、推送到 GitHub。仓库已有的 GitHub Actions 会生成和发布网站。本地保存并不会自动更新线上站点。
+上线前运行 npm run check。新增的 .md 提交到私有文章库，MP4 和封面仍提交到网站代码库。文章更新后到网站 Actions 手动发布，或等待约每半小时的定时构建；GitHub 调度可能延迟。本地保存不会自动更新线上站点。
 
-首次部署视频栏目时，页面、样式、播放器、配置和视频文件需要一并提交；之后新增视频通常只需提交对应的 Markdown、MP4 和可选封面。_site/ 和 node_modules/ 不需要提交。
+页面模板与文章源文件已经分开管理，详细配置见 [私有内容说明](private-content.md)。_site/、node_modules/ 和 src 下的临时 Markdown 都不提交。

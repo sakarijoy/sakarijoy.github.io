@@ -3,3 +3,8 @@ _site/
 .npm-cache/
 .env
 .env.*
+.content-build/
+.private-content/
+src/posts/*.md
+src/travel/*.md
+src/videos/*.md
