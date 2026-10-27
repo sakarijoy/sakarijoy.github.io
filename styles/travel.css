@@ -11,8 +11,6 @@
 .travel-map-caption .eyebrow { margin: 0 0 5px; font-size: 10px; color: #647f70; }
 .travel-map-caption h2 { margin: 0; font-size: 21px; font-weight: 500; }
 .travel-map-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
-.travel-route-control { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #3a6456; cursor: pointer; }
-.travel-route-control input { accent-color: #447c6a; width: 16px; height: 16px; }
 #travel-map { height: 510px; z-index: 0; background: #e7ede5; }
 #travel-map-status { margin: 0; padding: 12px 26px; font-size: 12px; color: #5e7166; min-height: 44px; }
 .travel-panel { margin-top: 38px; }

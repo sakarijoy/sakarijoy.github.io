@@ -4,7 +4,6 @@
   const year = document.querySelector('#travel-year');
   const status = document.querySelector('#travel-status');
   const mapStatus = document.querySelector('#travel-map-status');
-  const routeToggle = document.querySelector('#travel-route');
   const trips = [...document.querySelectorAll('[data-trip]')].map(el => {
     const lat = Number(el.dataset.lat), lng = Number(el.dataset.lng);
     const valid = el.dataset.lat.trim() !== '' && el.dataset.lng.trim() !== '' && Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
@@ -54,22 +53,10 @@
     document.querySelector('#travel-no-results').hidden = !trips.length || shown.length > 0;
     if (map) {
       map.closePopup(); layer.clearLayers(); located.forEach(t => layer.addLayer(t.marker)); fit();
-      if (routeToggle.checked) {
-        const routes = new Map();
-        located.filter(t => t.el.dataset.year !== 'undated').sort((a, b) => a.el.querySelector('time').dateTime.localeCompare(b.el.querySelector('time').dateTime)).forEach(t => {
-          const key = t.el.dataset.year;
-          if (!routes.has(key)) routes.set(key, []);
-          routes.get(key).push([t.lat, t.lng]);
-        });
-        routes.forEach(points => {
-          if (points.length > 1) L.polyline(points, { color: '#447c6a', weight: 3, opacity: 0.8, dashArray: '8 7', interactive: false }).addTo(layer);
-        });
-      }
-      mapStatus.textContent = located.length ? (routeToggle.checked ? '虚线按日期连接同一年内的可见地点，表示到访顺序，不代表实际交通路线。' : '点击地图标记阅读游记；使用 + / − 缩放地图。') : '暂无可显示的点位，等待记录下一段旅程。';
+      mapStatus.textContent = located.length ? '点击彩色圆点查看地点与游记；可按年份筛选，使用 + / − 缩放地图。' : '暂无可显示的点位，等待记录下一段旅程。';
     } else mapStatus.textContent = '地图组件未能加载，请检查网络并刷新；仍可搜索和阅读游记。';
   }
   search.addEventListener('input', update); year.addEventListener('change', update);
-  routeToggle.addEventListener('change', update);
   document.querySelector('#travel-reset').addEventListener('click', () => { search.value = ''; year.value = ''; update(); });
   document.querySelector('#travel-fit').addEventListener('click', fit);
   document.querySelector('#travel-fit').disabled = !map;

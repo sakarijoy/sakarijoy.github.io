@@ -13,38 +13,18 @@
 
 地图采用 Leaflet 1.9.4 和 OpenStreetMap 标准底图，需要访问 unpkg.com 与 tile.openstreetmap.org；网络异常时保留游记列表并显示错误提示。较大访问量或正式商用前应按 https://operations.osmfoundation.org/policies/tiles/ 选择合适的瓦片服务。当前修改保留现有 GitHub Pages 发布方式，本地构建不会自动更新线上网站。
 
-## 按时间连接足迹
+## 地图按点位展示
 
-地图默认启用“按旅行日期连线”。同一年内的可见点位按游记 date 从早到晚连接；跨年份不会连接。筛选年份或搜索时，连线同步更新；取消勾选可隐藏连线。连线是地点之间的示意线，不表示开车、铁路或飞行的真实轨迹。同一天的记录保持现有列表顺序，建议填写真实旅行日期。
+地图仅显示国家配色的圆点，不再绘制地点之间的连线，也不提供连线开关。可以通过年份筛选或地点搜索缩小显示范围；点击点位查看地点与游记，点击卡片中的“地图定位”聚焦对应地点。
 
-例如，分别创建青岛和长春两篇游记，在 location 中填写下列城市级近似坐标，并将 date 改成各自的真实到访日期，draft 改成 false。不要把示例日期当成实际行程。
-
-青岛：
-
-```yaml
-location:
-  name: 山东 · 青岛
-  latitude: 36.07
-  longitude: 120.38
-```
-
-长春：
-
-```yaml
-location:
-  name: 吉林 · 长春
-  latitude: 43.88
-  longitude: 125.32
-```
-
-两篇 date 均在 2026 年时，选择 2026 年即可看到两点及连线。城市级坐标适合展示足迹，具体景点请换成对应地点的 WGS84 坐标。
+日期仍用于年份筛选、游记排序和归档，不需要为了去掉连线而删除日期或坐标。未来同一区域点位明显重叠时，可另行增加聚合显示：缩小时显示数量，放大后展开具体地点。当前未增加聚合插件。
 
 ## 日期暂不明确的点位
 
-冲绳南城市和美丽海水族馆分别保存在 私有内容库 travel/okinawa-nanjo.md 与 私有内容库 travel/okinawa-churaumi.md。如将 visitDateUnknown 设置为 true，页面会显示“旅行日期待补充”，年份筛选中归入“日期待补充”，并暂不参与日期连线。date 暂存建档日期。确定真实旅行日期后修改 date，并将 visitDateUnknown 改为 false，即可参与对应年份的连线。
+冲绳南城市和美丽海水族馆分别保存在 私有内容库 travel/okinawa-nanjo.md 与 私有内容库 travel/okinawa-churaumi.md。如将 visitDateUnknown 设置为 true，页面会显示“旅行日期待补充”，年份筛选中归入“日期待补充”，date 可暂存建档日期。确定真实旅行日期后修改 date，并将 visitDateUnknown 改为 false，即可归入对应年份筛选。
 
 南城市使用城市级近似坐标 26.1631, 127.7706（https://en.wikipedia.org/wiki/Nanj%C5%8D）；水族馆使用 26.6944, 127.8780（https://jmapcode.com/mapcode/okinawa-churaumi-aquarium），位置与官方交通信息 https://oki-churaumi.jp/en/guide/access/ 对照。
 
 ## 地图圆点
 
-location.countryCode 为 CN 时显示暖橙色圆点，为 JP 时显示蓝色圆点，其他代码使用绿色。不显示图标分类图例；悬停、键盘聚焦或点击点位仍能查看地点，游记定位与时间连线保留。常熟使用城市级近似坐标 31.65, 120.73，来源：https://ungegn.un.org/dashboard/cities/details?id=1945 。
+location.countryCode 为 CN 时显示暖橙色圆点，为 JP 时显示蓝色圆点，其他代码使用绿色。不显示图标分类图例；悬停、键盘聚焦或点击点位仍能查看地点，保留游记定位、年份筛选和搜索功能。常熟使用城市级近似坐标 31.65, 120.73，来源：https://ungegn.un.org/dashboard/cities/details?id=1945 。
