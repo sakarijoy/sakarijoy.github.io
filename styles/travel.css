@@ -74,3 +74,10 @@
 .travel-map-dot.country-world { background: #548565; }
 .travel-country-marker:hover .travel-map-dot, .travel-country-marker:focus-visible .travel-map-dot { box-shadow: 0 0 0 4px #ffffff88, 0 1px 5px #17283c55; }
 .travel-country-marker:focus-visible { outline: 2px solid #80501f; outline-offset: 2px; border-radius: 50%; }
+.travel-cluster { display: grid; place-items: center; background: transparent; border: 0; }
+.travel-cluster-count { position: relative; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; color: #fff; background: #3c6c58; box-shadow: 0 0 0 5px #54856544, 0 2px 8px #17283c33; font: 700 14px/1 system-ui, sans-serif; }
+.travel-cluster-count.country-china { background: #9e4836; box-shadow: 0 0 0 5px #c65c4244, 0 2px 8px #17283c33; }
+.travel-cluster-count.country-japan { background: #2c6a8d; box-shadow: 0 0 0 5px #397fa744, 0 2px 8px #17283c33; }
+.travel-cluster:hover .travel-cluster-count { filter: brightness(1.1); }
+.travel-cluster:focus-visible { outline: 3px solid #80501f; outline-offset: 2px; border-radius: 50%; }
+.travel-cluster-label { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

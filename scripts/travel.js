@@ -11,12 +11,29 @@
     return { el, lat, lng, valid, country, marker: null };
   });
   [...new Set(trips.map(t => t.el.dataset.year))].sort().reverse().forEach(value => year.add(new Option(value === 'undated' ? '日期待补充' : value + ' 年', value)));
-  let map, layer;
+  let map, layer, clustering = false;
   if (window.L) {
     map = L.map('travel-map', { scrollWheelZoom: false }).setView([30, 105], 4);
     const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
     tiles.on('tileerror', () => { mapStatus.textContent = '底图加载失败，请检查网络；地点列表仍可使用。'; });
-    layer = L.layerGroup().addTo(map);
+    clustering = typeof L.markerClusterGroup === 'function';
+    layer = (clustering ? L.markerClusterGroup({
+      maxClusterRadius: zoom => zoom < 7 ? 52 : 40,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      spiderfyOnMaxZoom: true,
+      spiderLegPolylineOptions: { opacity: 0, weight: 0 },
+      animate: !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+      iconCreateFunction: cluster => {
+        const count = cluster.getChildCount();
+        const themes = new Set(cluster.getAllChildMarkers().map(marker => marker.options.travelTheme));
+        const theme = themes.size === 1 ? [...themes][0] : 'world';
+        return L.divIcon({
+          className: 'travel-cluster', iconSize: [44, 44], iconAnchor: [22, 22],
+          html: '<span class="travel-cluster-count country-' + theme + '"><span aria-hidden="true">' + count + '</span><span class="travel-cluster-label">' + count + ' 个地点，点击展开</span></span>'
+        });
+      }
+    }) : L.layerGroup()).addTo(map);
     trips.filter(t => t.valid).forEach(t => {
       const popup = document.createElement('div');
       const place = document.createElement('strong'); place.textContent = t.el.dataset.place || '旅行地点';
@@ -26,12 +43,19 @@
       const placeLabel = t.el.dataset.place || t.el.dataset.title;
       const label = placeLabel.startsWith(t.country.name) ? placeLabel : t.country.name + ' · ' + placeLabel;
       const tooltip = document.createElement('span'); tooltip.textContent = label;
-      t.marker = L.marker([t.lat, t.lng], { icon, title: label, alt: label }).bindPopup(popup).bindTooltip(tooltip, { direction: 'top', offset: [0, -14] });
+      t.marker = L.marker([t.lat, t.lng], { icon, title: label, alt: label, travelTheme: t.country.theme }).bindPopup(popup).bindTooltip(tooltip, { direction: 'top', offset: [0, -14] });
       t.marker.on('click', () => {
         trips.forEach(other => other.el.classList.toggle('is-active', other === t));
       });
       const button = t.el.querySelector('button'); button.hidden = false;
-      button.addEventListener('click', () => { map.setView([t.lat, t.lng], 12); t.marker.openPopup(); trips.forEach(other => other.el.classList.toggle('is-active', other === t)); document.querySelector('.travel-map-wrap').scrollIntoView({ block: 'start', behavior: 'auto' }); });
+      button.addEventListener('click', () => {
+        trips.forEach(other => other.el.classList.toggle('is-active', other === t));
+        map.setView([t.lat, t.lng], 12);
+        const open = () => { if (!t.el.hidden && t.el.classList.contains('is-active')) t.marker.openPopup(); };
+        if (clustering) layer.zoomToShowLayer(t.marker, open);
+        else open();
+        document.querySelector('.travel-map-wrap').scrollIntoView({ block: 'start', behavior: 'auto' });
+      });
     });
   }
   const visible = () => trips.filter(t => !t.el.hidden);
@@ -52,8 +76,11 @@
     status.textContent = `${shown.length} 篇游记 · ${located.length} 个点位` + (shown.length > located.length ? ` · ${shown.length - located.length} 篇待补充坐标` : '');
     document.querySelector('#travel-no-results').hidden = !trips.length || shown.length > 0;
     if (map) {
-      map.closePopup(); layer.clearLayers(); located.forEach(t => layer.addLayer(t.marker)); fit();
-      mapStatus.textContent = located.length ? '点击彩色圆点查看地点与游记；可按年份筛选，使用 + / − 缩放地图。' : '暂无可显示的点位，等待记录下一段旅程。';
+      map.closePopup(); layer.clearLayers();
+      if (clustering) layer.addLayers(located.map(t => t.marker));
+      else located.forEach(t => layer.addLayer(t.marker));
+      fit();
+      mapStatus.textContent = located.length ? (clustering ? '数字圆点表示附近的地点数量，点击或放大可展开；彩色圆点可查看游记。' : '点击彩色圆点查看地点与游记；点位聚合暂不可用，可按年份筛选。') : '暂无可显示的点位，等待记录下一段旅程。';
     } else mapStatus.textContent = '地图组件未能加载，请检查网络并刷新；仍可搜索和阅读游记。';
   }
   search.addEventListener('input', update); year.addEventListener('change', update);
