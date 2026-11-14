@@ -10,7 +10,9 @@
   <style>
 :root {
   color-scheme: light;
-  font-family: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
   color: #173640;
   background: #f2f8f8;
   font-synthesis: none;
@@ -234,7 +236,9 @@ dialog::backdrop { background: #102f3b70; }
   .page-nav a.nav.active::before { content: ""; position: absolute; inset: 0 0 auto; width: 29px; height: 3px; margin-inline: auto; border-radius: 0 0 5px 5px; background: var(--accent); }
   .notice { bottom: calc(var(--mobile-nav-height) + 9px); z-index: 4; }
   .page-header { position: sticky; top: 0; z-index: 1; align-items: start; flex-direction: column; gap: 8px; margin: 0 calc(-1 * var(--mobile-gutter)) 12px; padding: 9px var(--mobile-gutter) 10px; background: #f2f8f8; border-bottom: 1px solid var(--line); }
-  .page-header h1, .page-header h2.page-title { font-size: 24px; }
+  .brand strong, h2 { font-size: 1.125rem; }
+  .brand strong, h2, .page-header h1, .page-header h2.page-title { letter-spacing: normal; }
+  .page-header h1, .page-header h2.page-title { font-size: 1.5rem; }
   .page-header p { display: none; }
   .header-actions { width: 100%; justify-content: space-between; gap: 8px; }
   #assets .header-actions > button { flex: 1; }
@@ -245,6 +249,8 @@ dialog::backdrop { background: #102f3b70; }
   .metric.balance { grid-column: 1 / -1; }
   .asset-summary .balance { grid-column: auto; }
   .metric { padding: 11px 12px 13px; }
+  .metric strong { font-size: 1.5rem; font-variant-numeric: tabular-nums; letter-spacing: -.025em; }
+  #overview .metric.balance strong { font-size: 1.75rem; }
   .metric-icon { width: 29px; height: 29px; }
   .metric-icon svg { width: 16px; height: 16px; }
   .detail-grid { grid-template-columns: 1fr; gap: 13px; }
@@ -252,14 +258,17 @@ dialog::backdrop { background: #102f3b70; }
   .breakdown .ring { margin-bottom: 14px; }
   .panel { padding: 15px 13px; }
   .entry { gap: 7px; }
-  .entry-label strong, .entry-amount { font-size: 14px; }
+  .entry-label strong, .entry-amount { font-size: .9375rem; }
+  .metric small, .entry-label small, .ring small { font-size: .75rem; }
+  .primary, .secondary, .photo-actions button, .legend-item, .month-picker { font-size: .875rem; }
+  .field, .asset-presets-heading h3, .asset-selected-title, .photo-title { font-size: .875rem; }
   .asset-table-scroll { display: none; }
   .asset-cards { display: grid; gap: 10px; }
   .asset-cards:empty { display: none; }
   .asset-card { min-width: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
   .asset-card summary { min-height: 48px; padding: 12px; background: #e9f5f7; cursor: pointer; overflow-wrap: anywhere; }
   .asset-card summary strong { float: right; margin-left: 4px; max-width: 58%; font-variant-numeric: tabular-nums; }
-  .asset-card dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; margin: 0; padding: 12px; font-size: 14px; }
+  .asset-card dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; margin: 0; padding: 12px; font-size: .875rem; }
   .asset-card dt { color: var(--muted); overflow-wrap: anywhere; }
   .asset-card dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
   .asset-card .asset-date { min-height: 44px; width: 100%; border-top: 1px solid var(--line); }
