@@ -52,6 +52,7 @@ main { width: 100%; min-width: 0; max-width: 1480px; margin-inline: auto; paddin
 .backup-note { margin: 8px 0 12px; font-size: .875rem; color: var(--muted); }
 .backup-note:empty { display: none; }
 .backup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.offline-download { display: inline-flex; align-items: center; color: var(--accent); text-decoration: none; }
 #restore-backup { min-height: 44px; }
 h1, h2, p { margin: 0; }
 h1, h2.page-title { font-size: clamp(27px,3vw,38px); line-height: 1.2; letter-spacing: -.045em; }
@@ -415,7 +416,9 @@ dialog::backdrop { background: #102f3b70; }
     <div class="backup-actions">
       <button id="download-backup" class="primary" type="button">下载备份</button>
       <button id="choose-backup" class="secondary" type="button">选择备份文件</button>
+      <a id="download-offline" class="secondary offline-download" href="offline.html" download="日日记账.html" hidden>下载离线 HTML</a>
     </div>
+    <p id="offline-status" class="backup-note" role="status"></p>
     <input id="backup-file" type="file" accept=".json,application/json" hidden>
     <p id="backup-status" class="backup-note" role="status"></p>
     <button id="restore-backup" class="danger" type="button" hidden>确认替换当前账本</button>
@@ -977,6 +980,26 @@ function enablePageUpdates() {
 }
 
 enablePageUpdates();
+
+function enableOfflineAccess() {
+  if (window.location.protocol !== "https:" || !document.querySelector('meta[name="ledger-version"]')) return;
+  $("download-offline").hidden = false;
+  const status = $("offline-status");
+  if (!("serviceWorker" in navigator)) {
+    status.textContent = "当前浏览器无法缓存网页，可以下载离线 HTML。";
+    return;
+  }
+  status.textContent = "正在准备离线页面…";
+  const showReady = () => {
+    if (navigator.serviceWorker.controller) status.textContent = "已可离线使用。断网时用同一浏览器打开原网址。";
+  };
+  navigator.serviceWorker.addEventListener("controllerchange", showReady);
+  navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }).then(showReady).catch(() => {
+    if (!navigator.serviceWorker.controller) status.textContent = "离线缓存暂未完成。请联网重新打开，或下载离线 HTML。";
+  });
+}
+
+enableOfflineAccess();
 
 // iOS Safari can ignore the viewport zoom limits.
 for (const eventName of ["gesturestart", "gesturechange"]) {

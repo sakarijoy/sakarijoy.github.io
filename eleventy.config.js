@@ -16,10 +16,13 @@ export default function (eleventyConfig) {
   eleventyConfig.on('eleventy.after', async ({ dir }) => {
     const ledger = path.join(dir.output, 'jizhang');
     const index = path.join(ledger, 'index.html');
-    const html = await readFile(index, 'utf8');
-    const version = createHash('sha256').update(html).digest('hex').slice(0, 16);
+    const workerFile = path.join(ledger, 'sw.js');
+    const [html, worker] = await Promise.all([readFile(index, 'utf8'), readFile(workerFile, 'utf8')]);
+    const version = createHash('sha256').update(html).update(worker).digest('hex').slice(0, 16);
     await writeFile(index, html.replace('</head>', `  <meta name="ledger-version" content="${version}">\n</head>`));
     await writeFile(path.join(ledger, 'version.json'), JSON.stringify({ version }));
+    await writeFile(workerFile, worker.replace('__LEDGER_VERSION__', version));
+    await writeFile(path.join(ledger, 'offline.html'), html);
   });
   eleventyConfig.addNunjucksFilter('relativeUrl', (target, from = '/index.html') => {
     if (/^(?:https?:|mailto:|#)/.test(target)) return target;
