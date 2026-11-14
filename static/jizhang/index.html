@@ -23,10 +23,10 @@ body { margin: 0; min-width: 300px; }
 svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .symbols, [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-button, input, select { font: inherit; }
+button, input, select, textarea { font: inherit; }
 button { cursor: pointer; color: inherit; }
 button:disabled { cursor: default; opacity: .45; }
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, .month-picker:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .month-picker:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
 .app { display: grid; grid-template-columns: 228px minmax(0, 1fr); min-height: 100vh; }
 .sidebar { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; padding: 35px 19px 23px; background: #fff; border-right: 1px solid var(--line); }
 .brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; }
@@ -167,7 +167,9 @@ dialog::backdrop { background: #102f3b70; }
 .type input { accent-color: var(--accent); }
 .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
 .field { display: grid; gap: 6px; margin-bottom: 13px; min-width: 0; font-size: 13px; font-weight: 650; }
-.field input, .field select { width: 100%; min-width: 0; height: 40px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: 8px; background: white; color: inherit; font-weight: 400; }
+.field input, .field select, .field textarea { width: 100%; min-width: 0; height: 40px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: 8px; background: white; color: inherit; font-weight: 400; }
+.field textarea { resize: none; line-height: 24px; }
+.field input::-webkit-contacts-auto-fill-button { display: none !important; }
 .location-field { display: grid; gap: 7px; margin-bottom: 13px; }
 .location-field .field { margin: 0; }
 .location-actions { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
@@ -264,7 +266,8 @@ dialog::backdrop { background: #102f3b70; }
   .dialog-header { position: sticky; top: 0; z-index: 1; background: white; }
   .dialog-footer { position: sticky; bottom: 0; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); background: white; }
   .dialog-footer .primary { flex: 1; }
-  .field input, .field select { height: 44px; font-size: 16px; }
+  .field input, .field select, .field textarea { height: 44px; font-size: 16px; }
+  .field textarea { line-height: 28px; }
   #asset-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .asset-preset button { min-height: 44px; font-size: 13px; }
   .asset-preset { grid-template-columns: minmax(0, 1fr) 44px; }
@@ -406,7 +409,7 @@ dialog::backdrop { background: #102f3b70; }
       <div id="asset-presets-list"></div>
     </section>
     <form id="new-asset-column" class="asset-column-form" autocomplete="off">
-      <label class="field">自定义列目<input name="columnName" autocomplete="off" maxlength="30" required placeholder="输入列目名称"></label>
+      <label class="field">自定义列目<textarea name="columnName" rows="1" autocomplete="off" maxlength="30" required placeholder="输入列目名称"></textarea></label>
       <button class="primary" type="submit">添加</button>
     </form>
     <p id="asset-columns-status" class="asset-form-hint" role="status"></p>
@@ -423,7 +426,7 @@ dialog::backdrop { background: #102f3b70; }
         <label class="field">日期<input name="date" type="date" min="0001-01-01" max="9999-12-31" required></label>
       </div>
       <div class="location-field">
-        <label class="field">地点<input name="location" autocomplete="off" maxlength="80" placeholder="选填，例如店名或地址"></label>
+        <label class="field">地点<textarea name="location" rows="1" autocomplete="off" maxlength="80" placeholder="选填，例如店名或地址"></textarea></label>
         <div class="location-actions">
           <button type="button" id="locate-entry" class="secondary" aria-describedby="location-status"><svg aria-hidden="true"><use href="#locate"/></svg>使用当前位置</button>
           <button type="button" id="open-location-map" class="secondary" aria-describedby="location-map-note">地图选点</button>
@@ -432,7 +435,7 @@ dialog::backdrop { background: #102f3b70; }
         <div id="location-pin" class="location-actions" hidden><span>已标记位置</span><button type="button" id="clear-location-pin" class="secondary">移除标记</button></div>
         <p id="location-status" role="status"></p>
       </div>
-      <label class="field">备注<input name="note" autocomplete="off" maxlength="80" placeholder="选填"></label>
+      <label class="field">备注<textarea name="note" rows="1" autocomplete="off" maxlength="80" placeholder="选填"></textarea></label>
       <div class="photo-field">
         <div class="photo-title">账单照片</div>
         <div class="photo-actions">
@@ -462,7 +465,7 @@ dialog::backdrop { background: #102f3b70; }
     <header class="dialog-header"><h2 id="location-map-title">在地图上标记地点</h2><button id="close-location-map" class="icon-button" type="button" aria-label="关闭地图"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
     <p id="map-status" role="status">正在加载地图…</p>
     <div id="location-map" aria-label="地点选择地图" hidden></div>
-    <label class="field">地点名称<input id="map-place-name" autocomplete="off" maxlength="80" placeholder="例如 店名或街道地址"></label>
+    <label class="field">地点名称<textarea id="map-place-name" rows="1" autocomplete="off" maxlength="80" placeholder="例如 店名或街道地址"></textarea></label>
     <footer class="dialog-footer">
       <button id="pin-map-center" class="secondary" type="button" disabled>标记地图中心</button>
       <button id="apply-location-map" class="primary" type="button" disabled>使用此地点</button>
@@ -721,6 +724,10 @@ function formatPoint({ lat, lng }) {
   return lat.toFixed(5) + ", " + lng.toFixed(5);
 }
 
+function locationLabel(value) {
+  return value.replace(/\s*\n\s*/g, " ").trim();
+}
+
 function setEntryPoint(point) {
   entryPoint = point;
   $("location-pin").hidden = !point;
@@ -844,7 +851,7 @@ $("close-location-map").addEventListener("click", () => mapDialog.close());
 $("apply-location-map").addEventListener("click", () => {
   if (!pendingPoint) return;
   setEntryPoint({ lat: pendingPoint.lat, lng: pendingPoint.lng });
-  fields.location.value = $("map-place-name").value.trim();
+  fields.location.value = locationLabel($("map-place-name").value);
   $("location-status").textContent = "已选定地图位置，随账单保存。";
   mapDialog.close();
 });
@@ -1025,7 +1032,7 @@ form.addEventListener("submit", (event) => {
     category: fields.category.value,
     amount,
     date: fields.date.value,
-    location: fields.location.value.trim() || (entryPoint ? formatPoint(entryPoint) : ""),
+    location: locationLabel(fields.location.value) || (entryPoint ? formatPoint(entryPoint) : ""),
     note: fields.note.value.trim(),
   };
   if (entryPoint) entry.locationPoint = entryPoint;
@@ -1436,7 +1443,8 @@ render();
       const label = document.createElement("label");
       label.className = "field";
       label.textContent = column.name;
-      const input = document.createElement("input");
+      const input = document.createElement("textarea");
+      input.rows = 1;
       input.autocomplete = "off";
       input.value = column.name;
       input.maxLength = 30;
@@ -1464,6 +1472,7 @@ render();
   }
 
   function updateColumn(id, name) {
+    if (name !== undefined) name = name.replace(/\s*\n\s*/g, " ").trim();
     let message;
     try {
       const { snapshots, columns, dates = {} } = readAssets();
