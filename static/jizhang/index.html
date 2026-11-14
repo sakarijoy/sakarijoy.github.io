@@ -386,7 +386,7 @@ dialog::backdrop { background: #102f3b70; }
     <p id="notice" class="notice" role="status"></p>
   </div>
   <dialog id="asset-editor" aria-labelledby="asset-editor-title">
-    <form id="asset-form">
+    <form id="asset-form" autocomplete="off">
       <header class="dialog-header"><h2 id="asset-editor-title">记录资产</h2><button type="button" id="close-asset-editor" class="icon-button" aria-label="关闭"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
       <label class="field">记录日期<input name="date" type="date" min="0001-01-01" max="9999-12-31" required></label>
       <p id="asset-date-note" class="asset-form-hint" role="status"></p>
@@ -405,8 +405,8 @@ dialog::backdrop { background: #102f3b70; }
       </div>
       <div id="asset-presets-list"></div>
     </section>
-    <form id="new-asset-column" class="asset-column-form">
-      <label class="field">自定义列目<input name="columnName" maxlength="30" required placeholder="输入列目名称"></label>
+    <form id="new-asset-column" class="asset-column-form" autocomplete="off">
+      <label class="field">自定义列目<input name="columnName" autocomplete="off" maxlength="30" required placeholder="输入列目名称"></label>
       <button class="primary" type="submit">添加</button>
     </form>
     <p id="asset-columns-status" class="asset-form-hint" role="status"></p>
@@ -414,16 +414,16 @@ dialog::backdrop { background: #102f3b70; }
     <div id="asset-column-list"></div>
   </dialog>
   <dialog id="editor" aria-labelledby="editor-title">
-    <form id="entry-form">
+    <form id="entry-form" autocomplete="off">
       <header class="dialog-header"><h2 id="editor-title">记一笔</h2><button type="button" id="close-editor" class="icon-button" aria-label="关闭"><svg><use href="#close"/></svg></button></header>
       <fieldset class="type"><legend class="sr-only">收支类型</legend><label><input type="radio" name="type" value="expense" checked>支出</label><label><input type="radio" name="type" value="income">收入</label></fieldset>
-      <label class="field">金额（元）<input name="amount" inputmode="decimal" pattern="[0-9]+(\.[0-9]{1,2})?" maxlength="12" placeholder="0.00" required></label>
+      <label class="field">金额（元）<input name="amount" autocomplete="off" inputmode="decimal" pattern="[0-9]+(\.[0-9]{1,2})?" maxlength="12" placeholder="0.00" required></label>
       <div class="field-grid">
         <label class="field">分类<select name="category" required></select></label>
         <label class="field">日期<input name="date" type="date" min="0001-01-01" max="9999-12-31" required></label>
       </div>
       <div class="location-field">
-        <label class="field">地点<input name="location" maxlength="80" placeholder="选填，例如店名或地址"></label>
+        <label class="field">地点<input name="location" autocomplete="off" maxlength="80" placeholder="选填，例如店名或地址"></label>
         <div class="location-actions">
           <button type="button" id="locate-entry" class="secondary" aria-describedby="location-status"><svg aria-hidden="true"><use href="#locate"/></svg>使用当前位置</button>
           <button type="button" id="open-location-map" class="secondary" aria-describedby="location-map-note">地图选点</button>
@@ -432,7 +432,7 @@ dialog::backdrop { background: #102f3b70; }
         <div id="location-pin" class="location-actions" hidden><span>已标记位置</span><button type="button" id="clear-location-pin" class="secondary">移除标记</button></div>
         <p id="location-status" role="status"></p>
       </div>
-      <label class="field">备注<input name="note" maxlength="80" placeholder="选填"></label>
+      <label class="field">备注<input name="note" autocomplete="off" maxlength="80" placeholder="选填"></label>
       <div class="photo-field">
         <div class="photo-title">账单照片</div>
         <div class="photo-actions">
@@ -462,7 +462,7 @@ dialog::backdrop { background: #102f3b70; }
     <header class="dialog-header"><h2 id="location-map-title">在地图上标记地点</h2><button id="close-location-map" class="icon-button" type="button" aria-label="关闭地图"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
     <p id="map-status" role="status">正在加载地图…</p>
     <div id="location-map" aria-label="地点选择地图" hidden></div>
-    <label class="field">地点名称<input id="map-place-name" maxlength="80" placeholder="例如 店名或街道地址"></label>
+    <label class="field">地点名称<input id="map-place-name" autocomplete="off" maxlength="80" placeholder="例如 店名或街道地址"></label>
     <footer class="dialog-footer">
       <button id="pin-map-center" class="secondary" type="button" disabled>标记地图中心</button>
       <button id="apply-location-map" class="primary" type="button" disabled>使用此地点</button>
@@ -1318,6 +1318,7 @@ render();
         label.textContent = name;
         const input = document.createElement("input");
         input.name = id;
+        input.autocomplete = "off";
         input.inputMode = "decimal";
         input.maxLength = 18;
         input.placeholder = "选填";
@@ -1431,10 +1432,12 @@ render();
     for (const column of columns) {
       const row = document.createElement("form");
       row.className = "asset-column-form";
+      row.autocomplete = "off";
       const label = document.createElement("label");
       label.className = "field";
       label.textContent = column.name;
       const input = document.createElement("input");
+      input.autocomplete = "off";
       input.value = column.name;
       input.maxLength = 30;
       input.required = true;
