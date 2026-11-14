@@ -165,7 +165,7 @@ dialog::backdrop { background: #102f3b70; }
 .type label { display: flex; align-items: center; justify-content: center; gap: 5px; background: #edf7f8; padding: 8px; border-radius: 8px; font-size: 14px; cursor: pointer; }
 .type label:has(:checked) { color: var(--accent); background: #d8eeed; font-weight: 700; }
 .type input { accent-color: var(--accent); }
-.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
 .field { display: grid; gap: 6px; margin-bottom: 13px; min-width: 0; font-size: 13px; font-weight: 650; }
 .field input, .field select, .field textarea { width: 100%; min-width: 0; height: 40px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: 8px; background: white; color: inherit; font-weight: 400; }
 .field textarea { resize: none; line-height: 24px; }
@@ -262,7 +262,10 @@ dialog::backdrop { background: #102f3b70; }
   .asset-card dt { color: var(--muted); overflow-wrap: anywhere; }
   .asset-card dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
   .asset-card .asset-date { min-height: 44px; width: 100%; border-top: 1px solid var(--line); }
-  dialog, #asset-editor, #asset-columns-editor, #location-map-editor { position: fixed; inset: auto 0 0; width: 100%; max-width: none; max-height: 92dvh; margin: 0; padding: 12px max(14px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); border-radius: 18px 18px 0 0; overscroll-behavior: contain; }
+  dialog, #asset-editor, #asset-columns-editor, #location-map-editor { position: fixed; inset: auto 0 0; box-sizing: border-box; width: 100%; min-width: 0; max-width: 100vw; max-height: 92dvh; margin: 0; padding: 12px max(14px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); border-radius: 18px 18px 0 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+  dialog form { min-width: 0; }
+  #editor .field-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  #editor input[type="date"], #asset-editor input[type="date"] { display: block; max-width: 100%; }
   .dialog-header { position: sticky; top: 0; z-index: 1; background: white; }
   .dialog-footer { position: sticky; bottom: 0; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); background: white; }
   .dialog-footer .primary { flex: 1; }
@@ -1113,6 +1116,51 @@ $("clear-demo").addEventListener("click", () => {
 });
 
 render();
+
+function enablePageUpdates() {
+  const currentVersion = document.querySelector('meta[name="ledger-version"]')?.content;
+  if (window.location.protocol !== "https:" || !currentVersion) return;
+
+  const manifestUrl = new URL("./version.json", document.baseURI);
+  let pendingVersion;
+  let checking = false;
+
+  function applyUpdate() {
+    if (!pendingVersion || document.hidden || document.querySelector("dialog[open]")) return;
+    const next = new URL(window.location.href);
+    if (next.searchParams.get("v") === pendingVersion) return;
+    next.searchParams.set("v", pendingVersion);
+    window.location.replace(next.href);
+  }
+
+  async function checkUpdate() {
+    if (document.hidden || checking) return;
+    checking = true;
+    try {
+      const response = await fetch(manifestUrl, { cache: "no-store" });
+      if (!response.ok) return;
+      const { version } = await response.json();
+      if (typeof version !== "string" || !/^[a-f0-9]{16}$/.test(version)) return;
+      pendingVersion = version === currentVersion ? null : version;
+      applyUpdate();
+    } catch {
+      // A temporary network failure can be retried on the next check.
+    } finally {
+      checking = false;
+    }
+  }
+
+  document.querySelectorAll("dialog").forEach((dialog) => dialog.addEventListener("close", applyUpdate));
+  document.addEventListener("visibilitychange", () => {
+    applyUpdate();
+    checkUpdate();
+  });
+  window.addEventListener("online", checkUpdate);
+  window.setInterval(checkUpdate, 5 * 60 * 1000);
+  checkUpdate();
+}
+
+enablePageUpdates();
 
 </script>
 <script>

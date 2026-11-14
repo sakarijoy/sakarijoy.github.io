@@ -1,5 +1,6 @@
 import path from 'node:path';
-import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { readFile, writeFile } from 'node:fs/promises';
 import { validateCommentService } from './tools/comment-config.mjs';
 import { validateSite, selectPublished, absoluteUrl, indexablePages, groupByYear, entryNeighbors } from './tools/content.mjs';
 export default function (eleventyConfig) {
@@ -12,6 +13,14 @@ export default function (eleventyConfig) {
   });
   eleventyConfig.addPassthroughCopy({ '.content-build/public-images': 'images', styles: 'styles', scripts: 'scripts', '.content-build/public-media': 'media', '.nojekyll': '.nojekyll' });
   eleventyConfig.addPassthroughCopy({ 'static/jizhang': 'jizhang' });
+  eleventyConfig.on('eleventy.after', async ({ dir }) => {
+    const ledger = path.join(dir.output, 'jizhang');
+    const index = path.join(ledger, 'index.html');
+    const html = await readFile(index, 'utf8');
+    const version = createHash('sha256').update(html).digest('hex').slice(0, 16);
+    await writeFile(index, html.replace('</head>', `  <meta name="ledger-version" content="${version}">\n</head>`));
+    await writeFile(path.join(ledger, 'version.json'), JSON.stringify({ version }));
+  });
   eleventyConfig.addNunjucksFilter('relativeUrl', (target, from = '/index.html') => {
     if (/^(?:https?:|mailto:|#)/.test(target)) return target;
     const source = typeof from === 'string' ? from : '/index.html';
