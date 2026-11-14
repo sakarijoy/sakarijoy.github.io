@@ -45,9 +45,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .nav svg { width: 18px; height: 18px; }
 .privacy { margin-top: auto; padding: 17px 4px 0; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
 .privacy svg { width: 16px; height: 16px; }
-main { width: 100%; max-width: 1480px; margin-inline: auto; padding: 44px clamp(26px,4vw,64px) 34px; }
+main { width: 100%; min-width: 0; max-width: 1480px; margin-inline: auto; padding: 44px clamp(26px,4vw,64px) 34px; }
 .page-header, .header-actions, .month-switch, .month-picker, .metric-top, .panel-heading { display: flex; align-items: center; }
 .page-header { justify-content: space-between; gap: 22px; margin-bottom: 29px; }
+.ledger-search { margin-top: 10px; }
+.backup-note { margin: 8px 0 12px; font-size: .875rem; color: var(--muted); }
+.backup-note:empty { display: none; }
+.backup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+#restore-backup { min-height: 44px; }
 h1, h2, p { margin: 0; }
 h1, h2.page-title { font-size: clamp(27px,3vw,38px); line-height: 1.2; letter-spacing: -.045em; }
 .page-header p { margin-top: 10px; color: var(--muted); font-size: 14px; }
@@ -219,7 +224,7 @@ dialog::backdrop { background: #102f3b70; }
     padding-bottom: var(--mobile-nav-height);
     overflow: hidden;
   }
-  main { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; padding: 0 var(--mobile-gutter) 16px; }
+  main { min-height: 0; overflow-y: auto; scrollbar-width: none; overscroll-behavior-y: contain; padding: 0 var(--mobile-gutter) 16px; }
   .sidebar { padding: calc(5px + env(safe-area-inset-top)) var(--mobile-gutter) 5px; min-height: calc(52px + env(safe-area-inset-top)); }
   .brand-icon { width: 36px; height: 36px; }
   .brand small { display: none; }
@@ -229,7 +234,7 @@ dialog::backdrop { background: #102f3b70; }
   .page-nav a.nav.active { background: transparent; color: var(--accent); }
   .page-nav a.nav.active::before { content: ""; position: absolute; inset: 0 0 auto; width: 29px; height: 3px; margin-inline: auto; border-radius: 0 0 5px 5px; background: var(--accent); }
   .notice { bottom: calc(var(--mobile-nav-height) + 9px); z-index: 4; }
-  .page-header { position: sticky; top: 0; z-index: 1; align-items: start; flex-direction: column; gap: 8px; margin: 0 calc(-1 * var(--mobile-gutter)) 12px; padding: 9px var(--mobile-gutter) 10px; background: #f2f8f8; border-bottom: 1px solid var(--line); }
+  .page-header { position: sticky; top: 0; z-index: 1; width: calc(100% + 2 * var(--mobile-gutter)); align-items: start; flex-direction: column; gap: 8px; margin: 0 calc(-1 * var(--mobile-gutter)) 12px; padding: 9px var(--mobile-gutter) 10px; background: #f2f8f8; border-bottom: 1px solid var(--line); }
   .brand strong, h2 { font-size: 1.125rem; }
   .brand strong, h2, .page-header h1, .page-header h2.page-title { letter-spacing: normal; }
   .page-header h1, .page-header h2.page-title { font-size: 1.5rem; }
@@ -239,6 +244,9 @@ dialog::backdrop { background: #102f3b70; }
   .primary, .secondary, .filters button, .type label, .attachment-action, .asset-column-form .danger { min-height: 44px; }
   .month-switch button, .icon-button { width: 44px; height: 44px; }
   .nav#export { min-height: 44px; }
+  .nav#open-backup { min-height: 44px; }
+  .nav#open-backup svg, .nav#export svg { display: none; }
+  .nav#open-backup, .nav#export { font-size: .75rem; padding-inline: 5px; }
   .summary { grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 14px; }
   .metric.balance { grid-column: 1 / -1; }
   .asset-summary .balance { grid-column: auto; }
@@ -313,6 +321,7 @@ dialog::backdrop { background: #102f3b70; }
     <aside class="sidebar">
       <div class="brand"><span class="brand-icon"><svg><use href="#book"/></svg></span><div><strong>日日记账</strong><small>个人收支账本</small></div></div>
       <div class="side-actions">
+        <button class="nav" id="open-backup" type="button"><svg aria-hidden="true"><use href="#book"/></svg><span>备份与恢复</span></button>
         <nav class="page-nav" aria-label="账本页面">
           <a id="nav-overview" href="#overview" class="nav active" aria-current="page"><svg aria-hidden="true"><use href="#grid"/></svg><span>账本概览</span></a>
           <a id="nav-assets" href="#assets" class="nav"><svg aria-hidden="true"><use href="#wallet"/></svg><span>月度资产</span></a>
@@ -362,6 +371,7 @@ dialog::backdrop { background: #102f3b70; }
               <button type="button" data-filter="income" aria-pressed="false">收入</button>
             </div>
           </div>
+          <label class="field ledger-search">搜索本月账单<input id="ledger-search" type="search" autocomplete="off" placeholder="备注、地点或分类"></label>
           <div id="entries"></div>
         </section>
       </div>
@@ -399,6 +409,17 @@ dialog::backdrop { background: #102f3b70; }
     </main>
     <p id="notice" class="notice" role="status"></p>
   </div>
+  <dialog id="backup-dialog" aria-labelledby="backup-title">
+    <header class="dialog-header"><h2 id="backup-title">备份与恢复</h2><button id="close-backup" class="icon-button" type="button" aria-label="关闭"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
+    <p class="backup-note">备份包含账单、照片和月度资产。恢复会替换当前浏览器里的账本。</p>
+    <div class="backup-actions">
+      <button id="download-backup" class="primary" type="button">下载备份</button>
+      <button id="choose-backup" class="secondary" type="button">选择备份文件</button>
+    </div>
+    <input id="backup-file" type="file" accept=".json,application/json" hidden>
+    <p id="backup-status" class="backup-note" role="status"></p>
+    <button id="restore-backup" class="danger" type="button" hidden>确认替换当前账本</button>
+  </dialog>
   <dialog id="asset-editor" aria-labelledby="asset-editor-title">
     <form id="asset-form" autocomplete="off">
       <header class="dialog-header"><h2 id="asset-editor-title">记录资产</h2><button type="button" id="close-asset-editor" class="icon-button" aria-label="关闭"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
@@ -559,7 +580,11 @@ function monthRecords() {
 }
 
 function renderEntries(entries) {
-  const visible = entries.filter((entry) => filter === "all" || entry.type === filter);
+  const query = $("ledger-search").value.trim().toLocaleLowerCase();
+  const visible = entries.filter((entry) =>
+    (filter === "all" || entry.type === filter) &&
+    (!query || [entry.note, entry.location, entry.category].some((value) =>
+      value?.toLocaleLowerCase().includes(query))));
   $("ledger-count").textContent = "共 " + visible.length + " 笔记录";
   const list = $("entries");
   list.replaceChildren();
@@ -567,7 +592,8 @@ function renderEntries(entries) {
     const empty = document.createElement("div");
     empty.className = "empty";
     empty.innerHTML = '<svg aria-hidden="true"><use href="#book"/></svg><p></p>';
-    empty.querySelector("p").textContent = filter === "all" ? "本月还没有记录" : "本月还没有这类记录";
+    empty.querySelector("p").textContent = query ? "没有找到符合搜索条件的账单"
+      : filter === "all" ? "本月还没有记录" : "本月还没有这类记录";
     list.append(empty);
     return;
   }
@@ -881,6 +907,7 @@ $("export").addEventListener("click", () => {
 });
 
 $("add").addEventListener("click", () => openEditor());
+$("ledger-search").addEventListener("input", () => renderEntries(monthRecords()));
 $("close-editor").addEventListener("click", () => editor.close());
 $("prev").addEventListener("click", () => shiftMonth(-1));
 $("next").addEventListener("click", () => shiftMonth(1));
@@ -1460,6 +1487,143 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
   }
   window.addEventListener("hashchange", route);
   route();
+
+  const backupDialog = $("backup-dialog");
+  const backupStatus = $("backup-status");
+  const restoreButton = $("restore-backup");
+  let pendingBackup = null;
+  let backupSelection = 0;
+
+  function isObject(value) {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+  }
+
+  function validBackup(backup) {
+    if (backup?.format !== "riri-ledger" || backup.version !== 1 ||
+      !Array.isArray(backup.records) || !Array.isArray(backup.hiddenPresets)) return false;
+    const entryIds = new Set();
+    for (const entry of backup.records) {
+      if (!isObject(entry) || typeof entry.id !== "string" || !entry.id || entryIds.has(entry.id) ||
+        !Object.hasOwn(categories, entry.type) || !Object.hasOwn(categories[entry.type], entry.category) ||
+        typeof entry.date !== "string" || !validDate(entry.date) ||
+        !Number.isSafeInteger(entry.amount) || entry.amount < 1 || entry.amount > 99999999999 ||
+        typeof entry.note !== "string" || (entry.location !== undefined && typeof entry.location !== "string") ||
+        (entry.photo !== undefined && (typeof entry.photo !== "string" || entry.photo.length > 160000 ||
+          !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(entry.photo)))) return false;
+      if (entry.locationPoint !== undefined) {
+        const point = entry.locationPoint;
+        if (!isObject(point) || !Number.isFinite(point.lat) || Math.abs(point.lat) > 90 ||
+          !Number.isFinite(point.lng) || Math.abs(point.lng) > 180) return false;
+      }
+      entryIds.add(entry.id);
+    }
+    if (!isObject(backup.assets)) return false;
+    const { columns, snapshots, dates = {} } = backup.assets;
+    if (!Array.isArray(columns) || !isObject(snapshots) || !isObject(dates) ||
+      !backup.hiddenPresets.every((name) => typeof name === "string")) return false;
+    const ids = new Set();
+    for (const column of columns) {
+      if (!isObject(column) || typeof column.id !== "string" || !/^[a-z][a-z0-9-]*$/i.test(column.id) ||
+        ids.has(column.id) || typeof column.name !== "string" || !column.name.trim()) return false;
+      ids.add(column.id);
+    }
+    for (const [month, snapshot] of Object.entries(snapshots)) {
+      if (!validMonth(month) || !isObject(snapshot) || !Object.entries(snapshot).every(([id, value]) =>
+        ids.has(id) && Number.isSafeInteger(value)) ||
+        Object.values(snapshot).reduce((sum, value) => sum + Math.abs(value), 0) > Number.MAX_SAFE_INTEGER / 2) return false;
+    }
+    return Object.entries(dates).every(([month, date]) => Object.hasOwn(snapshots, month) &&
+      typeof date === "string" && validDate(date) && date.startsWith(month + "-"));
+  }
+
+  $("open-backup").addEventListener("click", () => {
+    backupSelection += 1;
+    pendingBackup = null;
+    restoreButton.hidden = true;
+    backupStatus.textContent = "";
+    backupDialog.showModal();
+  });
+  $("close-backup").addEventListener("click", () => backupDialog.close());
+
+  $("download-backup").addEventListener("click", () => {
+    try {
+      const backup = {
+        format: "riri-ledger",
+        version: 1,
+        records: JSON.parse(localStorage.getItem(storageKey) ?? "[]"),
+        assets: readAssets(),
+        hiddenPresets: readHiddenPresets(),
+      };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: "application/json" }));
+      const download = document.createElement("a");
+      download.href = url;
+      download.download = "日日记账备份-" + today + ".json";
+      download.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      backupStatus.textContent = "已下载备份。";
+    } catch {
+      backupStatus.textContent = "无法生成备份，请检查浏览器存储。";
+    }
+  });
+
+  $("choose-backup").addEventListener("click", () => $("backup-file").click());
+  $("backup-file").addEventListener("change", async (event) => {
+    const [file] = event.target.files;
+    event.target.value = "";
+    if (!file) return;
+    pendingBackup = null;
+    restoreButton.hidden = true;
+    const selection = ++backupSelection;
+    backupStatus.textContent = "正在检查备份文件…";
+    try {
+      if (file.size > 20 * 1024 * 1024) throw new Error("Backup too large");
+      const backup = JSON.parse(await file.text());
+      if (!backupDialog.open || selection !== backupSelection) return;
+      if (!validBackup(backup)) throw new Error("Invalid backup");
+      pendingBackup = backup;
+      const { records: entries, assets } = backup;
+      backupStatus.textContent = `备份中有 ${entries.length} 笔账单、${entries.filter((entry) => entry.photo).length} 张照片、${Object.keys(assets.snapshots).length} 个月的资产记录。`;
+      restoreButton.hidden = false;
+    } catch {
+      if (backupDialog.open && selection === backupSelection) backupStatus.textContent = "无法读取备份，请选择 20 MB 以内的日日记账备份文件。";
+    }
+  });
+
+  restoreButton.addEventListener("click", () => {
+    if (!pendingBackup || !window.confirm("恢复会替换当前浏览器里的账单和月度资产。确定继续？")) return;
+    const changes = [
+      [storageKey, pendingBackup.records],
+      [key, pendingBackup.assets],
+      [hiddenPresetsKey, pendingBackup.hiddenPresets],
+    ];
+    const previous = [];
+    try {
+      for (const [target] of changes) previous.push([target, localStorage.getItem(target)]);
+      for (const [target] of changes) localStorage.removeItem(target);
+      for (const [target, value] of changes) localStorage.setItem(target, JSON.stringify(value));
+    } catch {
+      if (previous.length === changes.length) {
+        try {
+          for (const [target] of previous) localStorage.removeItem(target);
+          for (const [target, value] of previous) if (value !== null) localStorage.setItem(target, value);
+        } catch {
+          backupStatus.textContent = "浏览器存储出错，请保留备份文件。";
+          return;
+        }
+      }
+      backupStatus.textContent = "恢复失败，请检查浏览器存储空间。";
+      return;
+    }
+    records = pendingBackup.records;
+    pendingBackup = null;
+    restoreButton.hidden = true;
+    $("ledger-search").value = "";
+    filter = "all";
+    render();
+    route();
+    backupDialog.close();
+    announce("已恢复账本");
+  });
 })();
 
 </script>
