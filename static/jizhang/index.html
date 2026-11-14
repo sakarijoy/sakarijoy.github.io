@@ -169,11 +169,12 @@ dialog::backdrop { background: #102f3b70; }
 .field { display: grid; gap: 6px; margin-bottom: 13px; min-width: 0; font-size: 13px; font-weight: 650; }
 .field input, .field select, .field textarea { width: 100%; min-width: 0; height: 40px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: 8px; background: white; color: inherit; font-weight: 400; }
 .field textarea { resize: none; line-height: 24px; }
+.date-display { display: none; }
 .field input::-webkit-contacts-auto-fill-button { display: none !important; }
 .location-field { display: grid; gap: 7px; margin-bottom: 13px; }
 .location-field .field { margin: 0; }
 .location-actions { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
-.location-actions .secondary { display: inline-flex; align-items: center; gap: 5px; padding-inline: 9px; color: var(--accent); }
+.location-actions .secondary { display: inline-flex; align-items: center; gap: 5px; padding-inline: 9px; color: var(--accent); text-decoration: none; }
 #locate-entry svg { width: 15px; height: 15px; }
 #location-status, #location-map-note, #location-pin span, #map-status { color: var(--muted); font-size: 12px; }
 #location-status:empty { display: none; }
@@ -265,7 +266,12 @@ dialog::backdrop { background: #102f3b70; }
   dialog, #asset-editor, #asset-columns-editor, #location-map-editor { position: fixed; inset: auto 0 0; box-sizing: border-box; width: 100%; min-width: 0; max-width: 100vw; max-height: 92dvh; margin: 0; padding: 12px max(14px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); border-radius: 18px 18px 0 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
   dialog form { min-width: 0; }
   #editor .field-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
-  #editor input[type="date"], #asset-editor input[type="date"] { display: block; max-width: 100%; }
+  .date-control { position: relative; display: block; min-width: 0; width: 100%; max-width: 100%; overflow: hidden; border-radius: 8px; }
+  .date-control:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .date-display { display: flex; height: 44px; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: inherit; background: white; font-size: 16px; font-weight: 400; }
+  .date-display svg { width: 18px; height: 18px; color: var(--muted); }
+  .date-control input[type="date"] { position: absolute; inset: 0; display: block; width: 100%; min-width: 0; max-width: 100%; opacity: 0; margin: 0; padding: 0; border: 0; }
+  .date-control input[type="date"]::-webkit-calendar-picker-indicator { position: absolute; inset: 0; width: auto; height: auto; padding: 0; }
   .dialog-header { position: sticky; top: 0; z-index: 1; background: white; }
   .dialog-footer { position: sticky; bottom: 0; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); background: white; }
   .dialog-footer .primary { flex: 1; }
@@ -394,7 +400,7 @@ dialog::backdrop { background: #102f3b70; }
   <dialog id="asset-editor" aria-labelledby="asset-editor-title">
     <form id="asset-form" autocomplete="off">
       <header class="dialog-header"><h2 id="asset-editor-title">记录资产</h2><button type="button" id="close-asset-editor" class="icon-button" aria-label="关闭"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
-      <label class="field">记录日期<input name="date" type="date" min="0001-01-01" max="9999-12-31" required></label>
+      <label class="field">记录日期<span class="date-control"><span class="date-display" aria-hidden="true"><span class="date-value">选择日期</span><svg><use href="#calendar"/></svg></span><input name="date" type="date" min="0001-01-01" max="9999-12-31" required></span></label>
       <p id="asset-date-note" class="asset-form-hint" role="status"></p>
       <p class="asset-form-hint">负债填负数。空白列目按 0 元计入合计。</p>
       <div id="asset-fields" class="field-grid"></div>
@@ -426,15 +432,16 @@ dialog::backdrop { background: #102f3b70; }
       <label class="field">金额（元）<input name="amount" autocomplete="off" inputmode="decimal" pattern="[0-9]+(\.[0-9]{1,2})?" maxlength="12" placeholder="0.00" required></label>
       <div class="field-grid">
         <label class="field">分类<select name="category" required></select></label>
-        <label class="field">日期<input name="date" type="date" min="0001-01-01" max="9999-12-31" required></label>
+        <label class="field">日期<span class="date-control"><span class="date-display" aria-hidden="true"><span class="date-value">选择日期</span><svg><use href="#calendar"/></svg></span><input name="date" type="date" min="0001-01-01" max="9999-12-31" required></span></label>
       </div>
       <div class="location-field">
         <label class="field">地点<textarea name="location" rows="1" autocomplete="off" maxlength="80" placeholder="选填，例如店名或地址"></textarea></label>
         <div class="location-actions">
           <button type="button" id="locate-entry" class="secondary" aria-describedby="location-status"><svg aria-hidden="true"><use href="#locate"/></svg>使用当前位置</button>
-          <button type="button" id="open-location-map" class="secondary" aria-describedby="location-map-note">地图选点</button>
+          <a id="open-amap" class="secondary" href="https://www.amap.com/" target="_blank" rel="noopener noreferrer" aria-describedby="location-map-note">打开高德地图</a>
+          <button type="button" id="open-location-map" class="secondary" aria-describedby="location-map-note">网页内选点</button>
         </div>
-        <p id="location-map-note">在线地图由 OpenStreetMap 提供，打开时会加载所查看的区域。</p>
+        <p id="location-map-note">定位后可在高德查看附近地点，再把店名填到这里。网页内选点使用 OpenStreetMap。</p>
         <div id="location-pin" class="location-actions" hidden><span>已标记位置</span><button type="button" id="clear-location-pin" class="secondary">移除标记</button></div>
         <p id="location-status" role="status"></p>
       </div>
@@ -698,6 +705,7 @@ function openEditor(entry) {
   fields.type.value = entry?.type ?? "expense";
   fields.amount.value = entry ? (entry.amount / 100).toFixed(2) : "";
   fields.date.value = entry?.date ?? (month === today.slice(0, 7) ? today : month + "-01");
+  syncDateDisplay(fields.date);
   fields.location.value = entry?.location ?? "";
   setEntryPoint(entry?.locationPoint ?? parseCoordinates(fields.location.value));
   fields.note.value = entry?.note ?? "";
@@ -713,6 +721,16 @@ function resetLocationRequest() {
   locationRequest += 1;
   $("locate-entry").disabled = false;
   $("location-status").textContent = "";
+}
+
+function syncDateDisplay(input) {
+  input.parentElement.querySelector(".date-value").textContent = input.value || "选择日期";
+}
+
+for (const input of document.querySelectorAll(".date-control input")) {
+  const sync = () => syncDateDisplay(input);
+  input.addEventListener("input", sync);
+  input.addEventListener("change", sync);
 }
 
 function parseCoordinates(value) {
@@ -736,6 +754,27 @@ function setEntryPoint(point) {
   $("location-pin").hidden = !point;
 }
 
+$("open-amap").addEventListener("click", (event) => {
+  const link = event.currentTarget;
+  const point = entryPoint ?? parseCoordinates(fields.location.value);
+  const label = locationLabel(fields.location.value);
+  const hasName = label && !parseCoordinates(label);
+  let url = new URL("https://www.amap.com/");
+  if (point) {
+    url = new URL("https://uri.amap.com/marker");
+    url.searchParams.set("position", point.lng.toFixed(6) + "," + point.lat.toFixed(6));
+    url.searchParams.set("coordinate", "wgs84");
+  } else if (hasName) {
+    url = new URL("https://uri.amap.com/search");
+    url.searchParams.set("keyword", label);
+  }
+  if (url.hostname === "uri.amap.com") {
+    url.searchParams.set("src", "riri-ledger");
+    url.searchParams.set("callnative", "0");
+  }
+  link.href = url.href;
+});
+
 $("locate-entry").addEventListener("click", () => {
   const status = $("location-status");
   const button = $("locate-entry");
@@ -753,7 +792,7 @@ $("locate-entry").addEventListener("click", () => {
     return true;
   }
   navigator.geolocation.getCurrentPosition(({ coords }) => {
-    if (finish("已获取当前位置。可打开地图微调，或填写地点名称。")) {
+    if (finish("已获取当前位置。可打开高德查看附近地点，或手动填写地点名称。")) {
       setEntryPoint({ lat: coords.latitude, lng: coords.longitude });
       if (parseCoordinates(fields.location.value)) fields.location.value = "";
     }
@@ -1395,6 +1434,7 @@ enablePageUpdates();
         return;
       }
       dateField.value = existingMonth ? dates[existingMonth] ?? monthEnd(existingMonth) : today;
+      syncDateDisplay(dateField);
     } catch {
       announce("无法读取月度资产记录，请检查浏览器存储。");
       return;
