@@ -19,7 +19,14 @@ export default function (eleventyConfig) {
     const workerFile = path.join(ledger, 'sw.js');
     const [html, worker] = await Promise.all([readFile(index, 'utf8'), readFile(workerFile, 'utf8')]);
     const version = createHash('sha256').update(html).update(worker).digest('hex').slice(0, 16);
-    await writeFile(index, html.replace('</head>', `  <meta name="ledger-version" content="${version}">\n</head>`));
+    const appHead = [
+      `  <meta name="ledger-version" content="${version}">`,
+      '  <link rel="manifest" href="manifest.webmanifest">',
+      '  <link rel="icon" type="image/png" href="icon-192.png">',
+      '  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">',
+      '</head>',
+    ].join('\n');
+    await writeFile(index, html.replace('</head>', appHead));
     await writeFile(path.join(ledger, 'version.json'), JSON.stringify({ version }));
     await writeFile(workerFile, worker.replace('__LEDGER_VERSION__', version));
     await writeFile(path.join(ledger, 'offline.html'), html);
