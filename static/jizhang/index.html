@@ -54,8 +54,6 @@ main { width: 100%; min-width: 0; max-width: 1480px; margin-inline: auto; paddin
 .backup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 #restore-backup { min-height: 44px; }
 h1, h2, p { margin: 0; }
-h1, h2.page-title { font-size: clamp(27px,3vw,38px); line-height: 1.2; letter-spacing: -.045em; }
-.page-header p { margin-top: 10px; color: var(--muted); font-size: 14px; }
 .header-actions { gap: 12px; }
 .month-switch { border: 1px solid var(--line); background: white; border-radius: 10px; min-height: 43px; }
 .month-switch button, .icon-button { display: grid; place-items: center; width: 34px; height: 39px; background: transparent; border: 0; border-radius: 8px; color: var(--muted); }
@@ -268,9 +266,7 @@ dialog::backdrop { background: #102f3b70; }
   .notice { bottom: calc(var(--mobile-nav-height) + 9px); z-index: 4; }
   .page-header { position: sticky; top: 0; z-index: 1; width: calc(100% + 2 * var(--mobile-gutter)); align-items: start; flex-direction: column; gap: 8px; margin: 0 calc(-1 * var(--mobile-gutter)) 12px; padding: 9px var(--mobile-gutter) 10px; background: #f2f8f8; border-bottom: 1px solid var(--line); }
   .brand strong, h2 { font-size: 1.125rem; }
-  .brand strong, h2, .page-header h1, .page-header h2.page-title { letter-spacing: normal; }
-  .page-header h1, .page-header h2.page-title { font-size: 1.5rem; }
-  .page-header p { display: none; }
+  .brand strong, h2 { letter-spacing: normal; }
   .header-actions { width: 100%; justify-content: space-between; gap: 8px; }
   #assets .header-actions > button { flex: 1; }
   .primary, .secondary, .filters button, .type label, .attachment-action, .asset-column-form .danger { min-height: 44px; }
@@ -365,9 +361,9 @@ dialog::backdrop { background: #102f3b70; }
       </div>
       <div class="privacy"><svg><use href="#lock"/></svg><span>数据保存在当前浏览器</span></div>
     </aside>
-    <main id="overview">
+    <main id="overview" aria-labelledby="overview-page-name">
+      <h1 id="overview-page-name" class="sr-only">账本概览</h1>
       <header class="page-header">
-        <div><h1>账本概览</h1><p>记录每一笔收支，了解钱都花在哪。</p></div>
         <div class="header-actions">
           <div class="month-switch">
             <button type="button" id="prev" aria-label="上一个月"><svg><use href="#left"/></svg></button>
@@ -413,9 +409,9 @@ dialog::backdrop { background: #102f3b70; }
       </div>
       <div id="demo-bar" class="demo-bar" hidden><span><svg><use href="#spark"/></svg>正在查看示例账本</span><button id="clear-demo" type="button">开始记自己的账 <svg><use href="#right"/></svg></button></div>
     </main>
-    <main id="assets" hidden>
+    <main id="assets" aria-labelledby="assets-page-name" hidden>
+      <h2 id="assets-page-name" class="sr-only">月度资产</h2>
       <header class="page-header">
-        <div><h2 class="page-title">月度资产</h2><p>按实际日期记录账户余额，对比每月资产变化。</p></div>
         <div class="header-actions">
           <button id="manage-asset-columns" class="secondary" type="button">管理列目</button>
           <button id="add-asset-month" class="primary" type="button"><svg aria-hidden="true"><use href="#plus"/></svg>记录资产</button>
@@ -443,9 +439,9 @@ dialog::backdrop { background: #102f3b70; }
         <div class="empty" id="no-assets"><svg aria-hidden="true"><use href="#wallet"/></svg><p>还没有资产记录</p></div>
       </section>
     </main>
-    <main id="plans" hidden>
+    <main id="plans" aria-labelledby="plans-page-name" hidden>
+      <h2 id="plans-page-name" class="sr-only">支出计划</h2>
       <header class="page-header">
-        <div><h2 class="page-title">支出计划</h2><p>按月和按年对比计划与实际支出。</p></div>
         <div class="header-actions plan-actions">
           <div class="filters" role="group" aria-label="计划周期">
             <button type="button" data-plan-mode="month" aria-pressed="true">月计划</button>
