@@ -177,8 +177,12 @@ dialog::backdrop { background: #102f3b70; }
 .amount-field .field { margin: 0; }
 #negative-amount { min-height: 40px; }
 #negative-amount[aria-pressed="true"] { background: #d8eeed; border-color: #9eced0; color: var(--accent); }
-.amount-field input[type="number"] { appearance: textfield; }
-.amount-field input::-webkit-inner-spin-button, .amount-field input::-webkit-outer-spin-button { appearance: none; margin: 0; }
+#amount-display { min-height: 40px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: 8px; background: white; text-align: left; font-weight: 400; font-variant-numeric: tabular-nums; }
+#amount-display[aria-expanded="true"] { border-color: var(--accent); }
+#amount-keypad { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+#amount-keypad button { min-height: 44px; border: 1px solid var(--line); border-radius: 8px; background: #f2f8f8; font-size: 1rem; }
+#amount-keypad button:hover { background: #d8eeed; }
+#amount-keypad #close-amount-keypad { grid-column: span 2; background: var(--accent); color: white; }
 .field { display: grid; gap: 6px; margin-bottom: 13px; min-width: 0; font-size: 13px; font-weight: 650; }
 .field input, .field select, .field textarea { width: 100%; min-width: 0; height: 40px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: 8px; background: white; color: inherit; font-weight: 400; }
 .field textarea { resize: none; line-height: 24px; }
@@ -294,7 +298,7 @@ dialog::backdrop { background: #102f3b70; }
   .dialog-footer { position: sticky; bottom: 0; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); background: white; }
   .dialog-footer .primary { flex: 1; }
   .field input, .field select, .field textarea { height: 44px; font-size: 16px; }
-  #negative-amount { min-height: 44px; }
+  #negative-amount, #amount-display { min-height: 44px; }
   .field textarea { line-height: 28px; }
   #asset-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .asset-preset button { min-height: 44px; font-size: 13px; }
@@ -460,9 +464,28 @@ dialog::backdrop { background: #102f3b70; }
     <form id="entry-form" autocomplete="off">
       <header class="dialog-header"><h2 id="editor-title">记一笔</h2><button type="button" id="close-editor" class="icon-button" aria-label="关闭" autofocus><svg><use href="#close"/></svg></button></header>
       <fieldset class="type"><legend class="sr-only">收支类型</legend><label><input type="radio" name="type" value="expense" checked>支出</label><label><input type="radio" name="type" value="income">收入</label></fieldset>
-      <div class="amount-field">
-        <label class="field">金额（元）<input name="amount" type="number" autocomplete="off" inputmode="decimal" min="-999999999.99" max="999999999.99" step="0.01" placeholder="0.00" required></label>
+      <div id="amount-field" class="amount-field">
+        <div class="field">
+          <span id="amount-label">金额（元）</span>
+          <button id="amount-display" type="button" aria-labelledby="amount-label amount-value" aria-expanded="false" aria-controls="amount-keypad"><span id="amount-value" aria-live="polite">0.00</span></button>
+        </div>
         <button id="negative-amount" class="secondary" type="button" aria-pressed="false">负数</button>
+        <div id="amount-keypad" role="group" aria-label="金额数字键盘" hidden>
+          <button type="button" data-key="1">1</button>
+          <button type="button" data-key="2">2</button>
+          <button type="button" data-key="3">3</button>
+          <button type="button" data-key="4">4</button>
+          <button type="button" data-key="5">5</button>
+          <button type="button" data-key="6">6</button>
+          <button type="button" data-key="7">7</button>
+          <button type="button" data-key="8">8</button>
+          <button type="button" data-key="9">9</button>
+          <button type="button" data-key="." aria-label="小数点">.</button>
+          <button type="button" data-key="0">0</button>
+          <button type="button" data-key="Backspace" aria-label="删除最后一位">⌫</button>
+          <button type="button" data-key="Delete">清空</button>
+          <button type="button" id="close-amount-keypad">完成</button>
+        </div>
       </div>
       <div class="field-grid">
         <label class="field">分类<select name="category" required></select></label>
@@ -713,8 +736,10 @@ function openEditor(entry) {
   showPhoto(entry?.photo ?? "");
   editingId = entry?.id ?? null;
   fields.type.value = entry?.type ?? "expense";
-  fields.amount.value = entry ? (entry.amount / 100).toFixed(2) : "";
-  setNegativeAmount(entry?.amount < 0);
+  amountDraft = entry ? (Math.abs(entry.amount) / 100).toFixed(2) : "";
+  amountIsNegative = entry?.amount < 0;
+  renderAmount();
+  setAmountKeypad(false);
   fields.date.value = entry?.date ?? (month === today.slice(0, 7) ? today : month + "-01");
   syncDateDisplay(fields.date);
   fields.location.value = entry?.location ?? "";
@@ -728,23 +753,51 @@ function openEditor(entry) {
 }
 
 const negativeAmountButton = $("negative-amount");
+const amountDisplay = $("amount-display");
+const amountKeypad = $("amount-keypad");
+let amountDraft = "";
+let amountIsNegative = false;
 
-function setNegativeAmount(negative) {
-  negativeAmountButton.setAttribute("aria-pressed", String(negative));
+function renderAmount() {
+  $("amount-value").textContent = (amountIsNegative ? "−" : "") + (amountDraft || "0.00");
+  negativeAmountButton.setAttribute("aria-pressed", String(amountIsNegative));
 }
 
-negativeAmountButton.addEventListener("click", () => {
-  const negative = negativeAmountButton.getAttribute("aria-pressed") !== "true";
-  const value = fields.amount.value.replace(/^-/, "");
-  if (value) fields.amount.value = negative ? "-" + value : value;
-  setNegativeAmount(negative);
-});
+function setAmountKeypad(open) {
+  amountKeypad.hidden = !open;
+  amountDisplay.setAttribute("aria-expanded", String(open));
+}
 
-fields.amount.addEventListener("input", () => {
-  const value = fields.amount.value;
-  if (!value) return;
-  if (value.startsWith("-")) setNegativeAmount(true);
-  else if (negativeAmountButton.getAttribute("aria-pressed") === "true") fields.amount.value = "-" + value;
+function editAmount(key) {
+  if (key === "-") amountIsNegative = !amountIsNegative;
+  else if (key === "Backspace") amountDraft = amountDraft.slice(0, -1);
+  else if (key === "Delete") {
+    amountDraft = "";
+    amountIsNegative = false;
+  } else if (key === ".") {
+    if (!amountDraft.includes(".")) amountDraft = (amountDraft || "0") + ".";
+  } else {
+    const next = (amountDraft === "0" ? "" : amountDraft) + key;
+    if (/^\d{1,9}(?:\.\d{0,2})?$/.test(next)) amountDraft = next;
+  }
+  renderAmount();
+}
+
+negativeAmountButton.addEventListener("click", () => editAmount("-"));
+amountDisplay.addEventListener("click", () => setAmountKeypad(amountKeypad.hidden));
+$("close-amount-keypad").addEventListener("click", () => {
+  setAmountKeypad(false);
+  amountDisplay.focus();
+});
+amountKeypad.addEventListener("click", (event) => {
+  const key = event.target.closest("button[data-key]")?.dataset.key;
+  if (key) editAmount(key);
+});
+$("amount-field").addEventListener("keydown", (event) => {
+  if (event.ctrlKey || event.metaKey || event.altKey ||
+    !/^(?:[0-9.-]|Backspace|Delete)$/.test(event.key)) return;
+  event.preventDefault();
+  editAmount(event.key);
 });
 
 function parseEntryAmount(value) {
@@ -876,10 +929,11 @@ $("remove-photo").addEventListener("click", () => {
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   if ($("save-entry").disabled) return;
-  const amount = parseEntryAmount(fields.amount.value);
+  const amount = parseEntryAmount((amountIsNegative ? "-" : "") + amountDraft.replace(/\.$/, ""));
   if (amount === null) {
     $("form-error").textContent = "请输入非零金额，最多保留两位小数。";
-    fields.amount.focus();
+    setAmountKeypad(true);
+    amountDisplay.focus();
     return;
   }
   const current = load() ?? [];
