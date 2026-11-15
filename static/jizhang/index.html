@@ -70,6 +70,9 @@ h1, h2.page-title { font-size: clamp(27px,3vw,38px); line-height: 1.2; letter-sp
 .summary { display: grid; grid-template-columns: 1.08fr 1fr 1fr; gap: 17px; margin-bottom: 22px; }
 .metric, .panel { border: 1px solid var(--line); background: #fff; border-radius: 18px; box-shadow: 0 2px 3px #163b4208; min-width: 0; }
 .metric { padding: 17px 21px 22px; }
+.metric-filter { text-align: left; }
+.metric-filter:hover { border-color: #9eced0; }
+.metric-filter[aria-pressed="true"] { border-color: var(--accent); background: #edf7f8; }
 .metric.balance { color: white; background: radial-gradient(ellipse at 100% 0%, #287eaa 0%, transparent 62%), linear-gradient(115deg,#08645f,#176689); border-color: transparent; }
 .metric-top { justify-content: space-between; gap: 8px; font-size: 13px; font-weight: 650; }
 .metric-icon { width: 35px; height: 35px; display: grid; place-items: center; border-radius: 10px; background: #ffffff29; }
@@ -365,22 +368,22 @@ dialog::backdrop { background: #102f3b70; }
           <div class="metric-top"><span>本月结余</span><span class="metric-icon"><svg><use href="#wallet"/></svg></span></div>
           <strong id="balance">¥0.00</strong><small>本月收入 − 本月支出</small>
         </article>
-        <article class="metric">
-          <div class="metric-top"><span>本月收入</span><span class="metric-icon income"><svg><use href="#down"/></svg></span></div>
+        <button type="button" class="metric metric-filter" data-filter="income" aria-pressed="false" aria-controls="ledger-chart ledger-details">
+          <span class="metric-top"><span>本月收入</span><span class="metric-icon income"><svg aria-hidden="true"><use href="#down"/></svg></span></span>
           <strong id="income">¥0.00</strong><small id="income-count"></small>
-        </article>
-        <article class="metric">
-          <div class="metric-top"><span>本月支出</span><span class="metric-icon expense"><svg><use href="#up"/></svg></span></div>
+        </button>
+        <button type="button" class="metric metric-filter" data-filter="expense" aria-pressed="false" aria-controls="ledger-chart ledger-details">
+          <span class="metric-top"><span>本月支出</span><span class="metric-icon expense"><svg aria-hidden="true"><use href="#up"/></svg></span></span>
           <strong id="expense">¥0.00</strong><small id="expense-count"></small>
-        </article>
+        </button>
       </div>
       <div class="detail-grid">
-        <section class="panel breakdown" aria-labelledby="chart-title">
+        <section id="ledger-chart" class="panel breakdown" aria-labelledby="chart-title">
           <div class="panel-heading"><div><h2 id="chart-title">支出分类</h2><p id="chart-description">本月各类别支出占比</p></div></div>
-          <div class="ring" id="ring" aria-hidden="true"><div><small>总支出</small><strong id="ring-total">¥0.00</strong></div></div>
+          <div class="ring" id="ring" aria-hidden="true"><div><small id="ring-label">总支出</small><strong id="ring-total">¥0.00</strong></div></div>
           <div id="legend" class="legend"></div>
         </section>
-        <section class="panel ledger" aria-labelledby="ledger-title">
+        <section id="ledger-details" class="panel ledger" aria-labelledby="ledger-title">
           <div class="panel-heading">
             <div><h2 id="ledger-title">账单明细</h2><p id="ledger-count"></p></div>
             <div class="filters" aria-label="筛选收支">
@@ -539,9 +542,9 @@ const categories = {
   },
   income: {
     "工资": ["wallet", "#188361", "#e7f7ef"],
-    "奖金": ["spark", "#188361", "#e7f7ef"],
-    "兼职": ["bag", "#188361", "#e7f7ef"],
-    "其他": ["wallet", "#188361", "#e7f7ef"],
+    "奖金": ["spark", "#cb793f", "#fff1e7"],
+    "兼职": ["bag", "#457dc4", "#e9f2ff"],
+    "其他": ["wallet", "#777689", "#eeedf2"],
   },
 };
 
@@ -667,24 +670,27 @@ function renderEntries(entries) {
   }
 }
 
-function renderChart(expenses, total) {
+function renderChart(entries, total, type) {
+  const label = type === "income" ? "收入" : "支出";
+  $("chart-title").textContent = label + "分类";
+  $("ring-label").textContent = "总" + label;
   $("ring-total").textContent = money(total);
   const legend = $("legend");
   legend.replaceChildren();
   const totals = new Map();
-  for (const entry of expenses) {
+  for (const entry of entries) {
     totals.set(entry.category, (totals.get(entry.category) ?? 0) + entry.amount);
   }
   const ranked = Array.from(totals).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
   const magnitude = ranked.reduce((sum, [, amount]) => sum + Math.abs(amount), 0);
   $("chart-description").textContent = ranked.some(([, amount]) => amount < 0)
-    ? "按各类别净支出的绝对值计算占比"
-    : "本月各类别净支出占比";
+    ? "按各类别净" + label + "的绝对值计算占比"
+    : "本月各类别净" + label + "占比";
   const stops = [];
   let current = 0;
   for (const [category, amount] of ranked) {
     const percent = magnitude ? Math.abs(amount) / magnitude * 100 : 0;
-    const color = categories.expense[category][1];
+    const color = categories[type][category][1];
     if (percent) stops.push(color + " " + current + "% " + (current + percent) + "%");
     current += percent;
     const row = document.createElement("div");
@@ -697,7 +703,11 @@ function renderChart(expenses, total) {
     legend.append(row);
   }
   $("ring").style.background = stops.length ? "conic-gradient(" + stops.join(",") + ")" : "";
-  if (!ranked.length) legend.innerHTML = "<p>本月暂无支出</p>";
+  if (!ranked.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "本月暂无" + label;
+    legend.append(empty);
+  }
 }
 
 function render() {
@@ -719,7 +729,8 @@ function render() {
   $("demo-bar").hidden = records !== null;
   filters.forEach((button) => button.setAttribute("aria-pressed", button.dataset.filter === filter));
   renderEntries(entries);
-  renderChart(expenses, expense);
+  if (filter === "income") renderChart(incomes, income, "income");
+  else renderChart(expenses, expense, "expense");
 }
 
 function shiftMonth(step) {
