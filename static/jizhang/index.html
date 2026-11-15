@@ -180,6 +180,10 @@ dialog::backdrop { background: #102f3b70; }
 #amount-keypad button:hover { background: #d8eeed; }
 #amount-keypad button[aria-pressed="true"] { background: #d8eeed; border-color: #9eced0; color: var(--accent); }
 #amount-keypad #close-amount-keypad { background: var(--accent); color: white; }
+@media (max-height: 420px) {
+  #asset-editor #amount-keypad { gap: 4px; }
+  #asset-editor #amount-keypad button { min-height: 34px; }
+}
 .field { display: grid; gap: 6px; margin-bottom: 13px; min-width: 0; font-size: 13px; font-weight: 650; }
 .field input, .field select, .field textarea { width: 100%; min-width: 0; height: 40px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: 8px; background: white; color: inherit; font-weight: 400; }
 .field textarea { resize: none; line-height: 24px; }
@@ -752,6 +756,24 @@ function closeAmountKeypad() {
   activeAmount = null;
 }
 
+function revealAssetKeypad(field) {
+  const dialog = field.button.closest("#asset-editor");
+  if (!dialog) return;
+  requestAnimationFrame(() => {
+    if (activeAmount !== field || !dialog.open) return;
+    const viewport = dialog.getBoundingClientRect();
+    const header = dialog.querySelector(".dialog-header");
+    const footer = dialog.querySelector(".dialog-footer");
+    let top = viewport.top + dialog.clientTop + 8;
+    let bottom = viewport.top + dialog.clientTop + dialog.clientHeight - 8;
+    if (getComputedStyle(header).position === "sticky") top = Math.max(top, header.getBoundingClientRect().bottom + 8);
+    if (getComputedStyle(footer).position === "sticky") bottom = Math.min(bottom, footer.getBoundingClientRect().top - 8);
+    const keypad = amountKeypad.getBoundingClientRect();
+    if (keypad.bottom > bottom) dialog.scrollTop += Math.ceil(keypad.bottom - bottom);
+    else if (keypad.top < top) dialog.scrollTop -= Math.floor(Math.min(top - keypad.top, bottom - keypad.bottom));
+  });
+}
+
 function createAmountField(container, label, maxDigits, placeholder) {
   container.className = "field money-field";
   const title = document.createElement("span");
@@ -781,6 +803,7 @@ function createAmountField(container, label, maxDigits, placeholder) {
       amountKeypad.hidden = false;
       button.setAttribute("aria-expanded", "true");
       draw();
+      revealAssetKeypad(field);
     },
     reset(cents) {
       if (activeAmount === field) closeAmountKeypad();
