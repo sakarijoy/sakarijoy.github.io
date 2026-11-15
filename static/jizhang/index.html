@@ -66,7 +66,7 @@ h1, h2, p { margin: 0; }
 .page-header .filters { padding-block: 0; }
 .page-header .filters button { min-height: 0; }
 .page-header .month-switch button { height: 100%; }
-.page-header .plan-period { color: #325761; }
+.page-header .month-switch .plan-period { width: auto; color: #325761; padding-inline: 4px; text-decoration: underline dotted; text-underline-offset: 3px; }
 .month-switch { border: 1px solid var(--line); background: white; border-radius: 10px; min-height: 43px; }
 .month-switch button, .icon-button { display: grid; place-items: center; width: 34px; height: 39px; background: transparent; border: 0; border-radius: 8px; color: var(--muted); }
 .month-switch button:hover, .icon-button:hover { color: var(--accent); background: #e8f6f5; }
@@ -130,7 +130,7 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .legend-item small { min-width: 34px; text-align: right; color: var(--muted); }
 .budget-chart { grid-column: 1 / -1; display: grid; gap: 14px; }
 .budget-category { padding-top: 10px; border-top: 1px solid var(--line); }
-.budget-category h3 { margin: 0 0 6px; font-size: .9375rem; }
+.budget-category h3 { margin: 0 0 6px; font-size: .9375rem; overflow-wrap: anywhere; }
 .budget-line { display: grid; grid-template-columns: 4.25em minmax(0, 1fr) 12ch; align-items: center; gap: 7px; margin-top: 5px; font-size: .8125rem; }
 .budget-line strong { text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .budget-track { position: relative; height: 10px; border-radius: 4px; background: #edf4f6; }
@@ -138,6 +138,7 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .budget-line.actual .budget-bar { background: var(--accent); }
 .budget-track.negative-scale::after { content: ""; position: absolute; left: var(--zero); top: -2px; bottom: -2px; border-left: 1px solid #849ba4; }
 .plan-period { min-width: 6.5em; padding-inline: 4px; text-align: center; white-space: nowrap; }
+.plan-chart-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .demo-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 18px; background: #e2f2f5; border-radius: 10px; padding: 8px 14px; color: #285c66; font-size: 12px; }
 .demo-bar span, .demo-bar button { display: inline-flex; align-items: center; gap: 7px; }
 .demo-bar svg { width: 15px; height: 15px; }
@@ -324,7 +325,8 @@ dialog::backdrop { background: #102f3b70; }
   .field input, .field select, .field textarea { height: 44px; font-size: 16px; }
   .amount-display { min-height: 44px; font-size: 16px; }
   .field textarea { line-height: 28px; }
-  #asset-fields, #budget-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  #asset-fields, #budget-fields, #budget-name-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .plan-chart-heading { flex-wrap: wrap; }
   .asset-preset button { min-height: 44px; font-size: 13px; }
   .asset-preset { grid-template-columns: minmax(0, 1fr) 44px; }
 }
@@ -458,14 +460,14 @@ dialog::backdrop { background: #102f3b70; }
           </div>
           <div class="month-switch">
             <button id="plan-prev" type="button" aria-label="上一周期"><svg aria-hidden="true"><use href="#left"/></svg></button>
-            <span id="plan-period" class="plan-period" aria-live="polite"></span>
+            <button id="choose-plan-period" class="plan-period" type="button" aria-haspopup="dialog" aria-controls="plan-period-editor" title="选择计划时间"><span id="plan-period" aria-live="polite"></span></button>
             <button id="plan-next" type="button" aria-label="下一周期"><svg aria-hidden="true"><use href="#right"/></svg></button>
           </div>
         </div>
       </header>
       <div class="page-content">
         <section class="panel breakdown" aria-labelledby="plan-chart-title">
-          <div class="panel-heading"><div><h2 id="plan-chart-title">计划与实际</h2><p>年计划和月计划分别设置。</p></div><button id="edit-period-budget" type="button" class="secondary">设置计划</button></div>
+          <div class="panel-heading plan-chart-heading"><div><h2 id="plan-chart-title">计划与实际</h2><p>年计划和月计划分别设置。</p></div><div class="plan-chart-actions"><button id="rename-budget-items" type="button" class="secondary">修改条目名称</button><button id="edit-period-budget" type="button" class="secondary">设置计划</button></div></div>
           <div id="plan-chart" class="budget-chart"></div>
         </section>
       </div>
@@ -483,6 +485,26 @@ dialog::backdrop { background: #102f3b70; }
     <input id="backup-file" type="file" accept=".json,application/json" hidden>
     <p id="backup-status" class="backup-note" role="status"></p>
     <button id="restore-backup" class="danger" type="button" hidden>确认替换当前账本</button>
+  </dialog>
+  <dialog id="plan-period-editor" class="record-editor" aria-labelledby="plan-period-title">
+    <form id="plan-period-form" autocomplete="off">
+      <header class="dialog-header"><h2 id="plan-period-title">选择计划时间</h2><button id="close-plan-period" type="button" class="icon-button" aria-label="关闭" autofocus><svg aria-hidden="true"><use href="#close"/></svg></button></header>
+      <div class="record-editor-body field-grid">
+        <label class="field">年份<input name="year" type="number" min="1" max="9999" step="1" inputmode="numeric" autocomplete="off" required></label>
+        <label id="plan-month-field" class="field">月份<select name="month" required></select></label>
+      </div>
+      <footer class="dialog-footer"><button type="submit" class="primary">确定</button></footer>
+    </form>
+  </dialog>
+  <dialog id="budget-names-editor" class="record-editor" aria-labelledby="budget-names-title">
+    <form id="budget-names-form" autocomplete="off">
+      <header class="dialog-header"><h2 id="budget-names-title">修改条目名称</h2><button id="close-budget-names" type="button" class="icon-button" aria-label="关闭" autofocus><svg aria-hidden="true"><use href="#close"/></svg></button></header>
+      <div class="record-editor-body">
+        <p class="asset-form-hint">填写各账单分类在计划中的显示名称。留空会恢复原名。</p>
+        <div id="budget-name-fields" class="field-grid"></div>
+      </div>
+      <footer class="dialog-footer"><p id="budget-names-error" class="form-error" role="status"></p><button type="submit" class="primary">保存名称</button></footer>
+    </form>
   </dialog>
   <dialog id="budget-editor" class="record-editor" aria-labelledby="budget-editor-title">
     <form id="budget-form">
@@ -590,6 +612,7 @@ dialog::backdrop { background: #102f3b70; }
 const $ = (id) => document.getElementById(id);
 const storageKey = "riri-ledger-v1";
 const budgetKey = "riri-expense-plans-v1";
+const budgetNamesKey = "riri-expense-plan-names-v1";
 const currency = new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" });
 const categories = {
   expense: {
@@ -664,7 +687,7 @@ window.addEventListener("storage", (event) => {
     records = load();
     render();
   }
-  if (event.key === budgetKey) render();
+  if (event.key === budgetKey || event.key === budgetNamesKey) render();
 });
 
 function save(next) {
@@ -789,10 +812,16 @@ function readBudgets() {
   return JSON.parse(localStorage.getItem(budgetKey) ?? "{}");
 }
 
+function readBudgetNames() {
+  return JSON.parse(localStorage.getItem(budgetNamesKey) ?? "{}");
+}
+
 function renderBudgetChart(container, period) {
   let planned = {};
+  let names = {};
   try {
     planned = readBudgets()[period] ?? {};
+    names = readBudgetNames();
   } catch {
     // Keep actual expenses visible if the plans cannot be read.
   }
@@ -814,7 +843,7 @@ function renderBudgetChart(container, period) {
     const group = document.createElement("div");
     group.className = "budget-category";
     const heading = document.createElement("h3");
-    heading.textContent = row.category;
+    heading.textContent = names[row.category] ?? row.category;
     group.append(heading);
     for (const [type, label] of [["plan", "计划支出"], ["actual", "实际支出"]]) {
       const amount = row[type];
@@ -857,7 +886,9 @@ function periodLabel(period) {
 
 function renderPlans() {
   const period = planPeriod();
-  $("plan-period").textContent = periodLabel(period);
+  const label = periodLabel(period);
+  $("plan-period").textContent = label;
+  $("choose-plan-period").setAttribute("aria-label", "选择计划时间，当前为" + label);
   $("plan-prev").disabled = period === "0001" || period === "0001-01";
   $("plan-next").disabled = period === "9999" || period === "9999-12";
   const name = planMode === "year" ? "年计划" : "月计划";
@@ -1056,24 +1087,29 @@ const entryAmount = createAmountField($("entry-amount-field"), "金额（元）"
 const budgetEditor = $("budget-editor");
 const budgetFields = new Map();
 let editingPeriod;
-for (const category of Object.keys(categories.expense)) {
-  const container = document.createElement("div");
-  const field = createAmountField(container, category, 9, "未设置");
-  budgetFields.set(category, field);
-  $("budget-fields").append(container);
-}
 
 function openBudgetEditor(period) {
   let budgets;
+  let names;
   try {
     budgets = readBudgets();
+    names = readBudgetNames();
   } catch {
     announce("无法读取支出计划。");
     return;
   }
   editingPeriod = period;
+  if ($("budget-fields").contains(amountKeypad)) closeAmountKeypad();
+  $("budget-fields").replaceChildren();
+  budgetFields.clear();
   const current = budgets[period] ?? {};
-  for (const [category, field] of budgetFields) field.reset(current[category]);
+  for (const category of Object.keys(categories.expense)) {
+    const container = document.createElement("div");
+    const field = createAmountField(container, names[category] ?? category, 9, "未设置");
+    budgetFields.set(category, field);
+    $("budget-fields").append(container);
+    field.reset(current[category]);
+  }
   $("budget-month").textContent = periodLabel(period) + " · 留空表示未设置";
   $("budget-error").textContent = "";
   budgetEditor.showModal();
@@ -1102,6 +1138,79 @@ $("budget-form").addEventListener("submit", (event) => {
   budgetEditor.close();
   render();
   announce("已保存支出计划");
+});
+
+const planPeriodEditor = $("plan-period-editor");
+const planPeriodForm = $("plan-period-form");
+const planPeriodFields = planPeriodForm.elements;
+for (let number = 1; number <= 12; number++) {
+  planPeriodFields.month.add(new Option(number + "月", String(number).padStart(2, "0")));
+}
+$("choose-plan-period").addEventListener("click", () => {
+  const [year, number] = planPeriod().split("-");
+  planPeriodFields.year.value = Number(year);
+  planPeriodFields.month.value = number ?? "01";
+  const choosingYear = planMode === "year";
+  $("plan-period-title").textContent = choosingYear ? "选择年份" : "选择月份";
+  $("plan-month-field").hidden = choosingYear;
+  planPeriodFields.month.disabled = choosingYear;
+  planPeriodEditor.showModal();
+});
+$("close-plan-period").addEventListener("click", () => planPeriodEditor.close());
+planPeriodForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const yearNumber = Number(planPeriodFields.year.value);
+  if (!Number.isInteger(yearNumber) || yearNumber < 1 || yearNumber > 9999) return;
+  const year = String(yearNumber).padStart(4, "0");
+  if (planMode === "year") planYear = year;
+  else planMonth = year + "-" + planPeriodFields.month.value;
+  planPeriodEditor.close();
+  renderPlans();
+});
+
+const budgetNamesEditor = $("budget-names-editor");
+const budgetNameFields = new Map();
+for (const category of Object.keys(categories.expense)) {
+  const label = document.createElement("label");
+  label.className = "field";
+  label.textContent = category;
+  const field = document.createElement("textarea");
+  field.rows = 1;
+  field.maxLength = 24;
+  field.setAttribute("autocomplete", "off");
+  field.placeholder = category;
+  label.append(field);
+  $("budget-name-fields").append(label);
+  budgetNameFields.set(category, field);
+}
+$("rename-budget-items").addEventListener("click", () => {
+  try {
+    const names = readBudgetNames();
+    for (const [category, field] of budgetNameFields) field.value = names[category] ?? "";
+  } catch {
+    announce("无法读取条目名称。");
+    return;
+  }
+  $("budget-names-error").textContent = "";
+  budgetNamesEditor.showModal();
+});
+$("close-budget-names").addEventListener("click", () => budgetNamesEditor.close());
+$("budget-names-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const names = {};
+  for (const [category, field] of budgetNameFields) {
+    const name = locationLabel(field.value);
+    if (name && name !== category) names[category] = name;
+  }
+  try {
+    localStorage.setItem(budgetNamesKey, JSON.stringify(names));
+  } catch {
+    $("budget-names-error").textContent = "保存失败，请检查浏览器存储。";
+    return;
+  }
+  budgetNamesEditor.close();
+  render();
+  announce("已保存条目名称");
 });
 
 for (const button of document.querySelectorAll("[data-plan-mode]")) {
@@ -1922,6 +2031,9 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
         isObject(plan) && Object.entries(plan).every(([category, amount]) =>
           Object.hasOwn(categories.expense, category) && Number.isSafeInteger(amount) &&
           Math.abs(amount) <= 99999999999)))) return false;
+    if (backup.budgetNames !== undefined && (!isObject(backup.budgetNames) ||
+      !Object.entries(backup.budgetNames).every(([category, name]) =>
+        Object.hasOwn(categories.expense, category) && typeof name === "string" && name.trim() && name.length <= 24))) return false;
     const entryIds = new Set();
     for (const entry of backup.records) {
       if (!isObject(entry) || typeof entry.id !== "string" || !entry.id || entryIds.has(entry.id) ||
@@ -1974,6 +2086,7 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
         records: JSON.parse(localStorage.getItem(storageKey) ?? "[]"),
         assets: readAssets(),
         budgets: readBudgets(),
+        budgetNames: readBudgetNames(),
         hiddenPresets: readHiddenPresets(),
       };
       const url = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: "application/json" }));
@@ -2022,6 +2135,7 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
       [hiddenPresetsKey, pendingBackup.hiddenPresets],
     ];
     if (pendingBackup.budgets) changes.push([budgetKey, pendingBackup.budgets]);
+    if (pendingBackup.budgetNames) changes.push([budgetNamesKey, pendingBackup.budgetNames]);
     const previous = [];
     try {
       for (const [target] of changes) previous.push([target, localStorage.getItem(target)]);
