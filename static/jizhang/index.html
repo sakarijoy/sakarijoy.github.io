@@ -140,7 +140,13 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .asset-positive { color: #16815d; }
 .asset-negative { color: #a5333e; }
 #asset-editor { width: min(560px, calc(100% - 28px)); }
-#asset-editor .dialog-header { margin-bottom: 12px; }
+#asset-editor[open] { display: flex; flex-direction: column; overflow: hidden; }
+#asset-form { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+#asset-editor .dialog-header, #asset-editor .dialog-footer { position: static; }
+#asset-editor .dialog-header { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+#asset-editor .dialog-footer { flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--line); }
+#asset-editor .form-error { flex-basis: 100%; margin: 0 0 6px; }
+#asset-editor-body { min-height: 0; overflow: hidden auto; overscroll-behavior-y: contain; padding: 10px 4px 4px; }
 .asset-form-hint { margin-bottom: 14px; color: var(--muted); font-size: 12px; }
 .secondary { background: white; border: 1px solid var(--line); border-radius: 10px; min-height: 43px; padding: 0 12px; font-size: 13px; font-weight: 650; white-space: nowrap; }
 .secondary:hover { color: var(--accent); border-color: #9eced0; }
@@ -436,12 +442,16 @@ dialog::backdrop { background: #102f3b70; }
   <dialog id="asset-editor" aria-labelledby="asset-editor-title">
     <form id="asset-form" autocomplete="off">
       <header class="dialog-header"><h2 id="asset-editor-title">记录资产</h2><button type="button" id="close-asset-editor" class="icon-button" aria-label="关闭"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
-      <label class="field">记录日期<span class="date-control"><span class="date-display" aria-hidden="true"><span class="date-value">选择日期</span><svg><use href="#calendar"/></svg></span><input name="date" type="date" min="0001-01-01" max="9999-12-31" required></span></label>
-      <p id="asset-date-note" class="asset-form-hint" role="status"></p>
-      <p class="asset-form-hint">负债填负数。空白列目按 0 元计入合计。</p>
-      <div id="asset-fields" class="field-grid"></div>
-      <p id="asset-form-error" class="form-error" role="status"></p>
-      <footer class="dialog-footer"><button class="primary" type="submit">保存资产记录</button></footer>
+      <div id="asset-editor-body">
+        <label class="field">记录日期<span class="date-control"><span class="date-display" aria-hidden="true"><span class="date-value">选择日期</span><svg><use href="#calendar"/></svg></span><input name="date" type="date" min="0001-01-01" max="9999-12-31" required></span></label>
+        <p id="asset-date-note" class="asset-form-hint" role="status"></p>
+        <p class="asset-form-hint">负债填负数。空白列目按 0 元计入合计。</p>
+        <div id="asset-fields" class="field-grid"></div>
+      </div>
+      <footer class="dialog-footer">
+        <p id="asset-form-error" class="form-error" role="status"></p>
+        <button class="primary" type="submit">保存资产记录</button>
+      </footer>
     </form>
   </dialog>
   <dialog id="asset-columns-editor" aria-labelledby="asset-columns-title">
@@ -761,16 +771,13 @@ function revealAssetKeypad(field) {
   if (!dialog) return;
   requestAnimationFrame(() => {
     if (activeAmount !== field || !dialog.open) return;
-    const viewport = dialog.getBoundingClientRect();
-    const header = dialog.querySelector(".dialog-header");
-    const footer = dialog.querySelector(".dialog-footer");
-    let top = viewport.top + dialog.clientTop + 8;
-    let bottom = viewport.top + dialog.clientTop + dialog.clientHeight - 8;
-    if (getComputedStyle(header).position === "sticky") top = Math.max(top, header.getBoundingClientRect().bottom + 8);
-    if (getComputedStyle(footer).position === "sticky") bottom = Math.min(bottom, footer.getBoundingClientRect().top - 8);
+    const body = $("asset-editor-body");
+    const viewport = body.getBoundingClientRect();
+    const top = viewport.top + 4;
+    const bottom = viewport.top + body.clientHeight - 4;
     const keypad = amountKeypad.getBoundingClientRect();
-    if (keypad.bottom > bottom) dialog.scrollTop += Math.ceil(keypad.bottom - bottom);
-    else if (keypad.top < top) dialog.scrollTop -= Math.floor(Math.min(top - keypad.top, bottom - keypad.bottom));
+    if (keypad.bottom > bottom) body.scrollTop += Math.ceil(keypad.bottom - bottom);
+    else if (keypad.top < top) body.scrollTop -= Math.floor(Math.min(top - keypad.top, bottom - keypad.bottom));
   });
 }
 
