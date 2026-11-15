@@ -143,13 +143,14 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .asset-positive { color: #16815d; }
 .asset-negative { color: #a5333e; }
 #asset-editor { width: min(560px, calc(100% - 28px)); }
-#asset-editor[open] { display: flex; flex-direction: column; overflow: hidden; }
-#asset-form { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
-#asset-editor .dialog-header, #asset-editor .dialog-footer { position: static; }
-#asset-editor .dialog-header { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
-#asset-editor .dialog-footer { flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--line); }
-#asset-editor .form-error { flex-basis: 100%; margin: 0 0 6px; }
-#asset-editor-body { min-height: 0; overflow: hidden auto; overscroll-behavior-y: contain; padding: 10px 4px 4px; }
+:is(#asset-editor, #editor)[open] { display: flex; flex-direction: column; overflow: hidden; }
+:is(#asset-form, #entry-form) { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+:is(#asset-editor, #editor) :is(.dialog-header, .dialog-footer) { position: static; }
+:is(#asset-editor, #editor) .dialog-header { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+:is(#asset-editor, #editor) .dialog-footer { flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--line); }
+:is(#asset-editor, #editor) .form-error { flex-basis: 100%; margin: 0 0 6px; }
+.record-editor-body { min-height: 0; overflow: hidden auto; overscroll-behavior-y: contain; padding: 10px 4px 4px; }
+#entry-editor-body .type { margin-top: 0; }
 .asset-form-hint { margin-bottom: 14px; color: var(--muted); font-size: 12px; }
 .secondary { background: white; border: 1px solid var(--line); border-radius: 10px; min-height: 43px; padding: 0 12px; font-size: 13px; font-weight: 650; white-space: nowrap; }
 .secondary:hover { color: var(--accent); border-color: #9eced0; }
@@ -190,8 +191,8 @@ dialog::backdrop { background: #102f3b70; }
 #amount-keypad button[aria-pressed="true"] { background: #d8eeed; border-color: #9eced0; color: var(--accent); }
 #amount-keypad #close-amount-keypad { background: var(--accent); color: white; }
 @media (max-height: 420px) {
-  #asset-editor #amount-keypad { gap: 4px; }
-  #asset-editor #amount-keypad button { min-height: 34px; }
+  .record-editor-body #amount-keypad { gap: 4px; }
+  .record-editor-body #amount-keypad button { min-height: 34px; }
 }
 .field { display: grid; gap: 6px; margin-bottom: 13px; min-width: 0; font-size: 13px; font-weight: 650; }
 .field input, .field select, .field textarea { width: 100%; min-width: 0; height: 40px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: 8px; background: white; color: inherit; font-weight: 400; }
@@ -379,8 +380,8 @@ dialog::backdrop { background: #102f3b70; }
       </div>
       <div class="detail-grid">
         <section id="ledger-chart" class="panel breakdown" aria-labelledby="chart-title">
-          <div class="panel-heading"><div><h2 id="chart-title">支出分类</h2><p id="chart-description">本月各类别支出占比</p></div></div>
-          <div class="ring" id="ring" aria-hidden="true"><div><small id="ring-label">总支出</small><strong id="ring-total">¥0.00</strong></div></div>
+          <div class="panel-heading"><div><h2 id="chart-title">收支占比</h2><p id="chart-description">本月收入与支出占比</p></div></div>
+          <div class="ring" id="ring" aria-hidden="true"><div><small id="ring-label">收支合计</small><strong id="ring-total">¥0.00</strong></div></div>
           <div id="legend" class="legend"></div>
         </section>
         <section id="ledger-details" class="panel ledger" aria-labelledby="ledger-title">
@@ -445,7 +446,7 @@ dialog::backdrop { background: #102f3b70; }
   <dialog id="asset-editor" aria-labelledby="asset-editor-title">
     <form id="asset-form" autocomplete="off">
       <header class="dialog-header"><h2 id="asset-editor-title">记录资产</h2><button type="button" id="close-asset-editor" class="icon-button" aria-label="关闭"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
-      <div id="asset-editor-body">
+      <div id="asset-editor-body" class="record-editor-body">
         <label class="field">记录日期<span class="date-control"><span class="date-display" aria-hidden="true"><span class="date-value">选择日期</span><svg><use href="#calendar"/></svg></span><input name="date" type="date" min="0001-01-01" max="9999-12-31" required></span></label>
         <p id="asset-date-note" class="asset-form-hint" role="status"></p>
         <p class="asset-form-hint">负债填负数。空白列目按 0 元计入合计。</p>
@@ -477,32 +478,36 @@ dialog::backdrop { background: #102f3b70; }
   <dialog id="editor" aria-labelledby="editor-title">
     <form id="entry-form" autocomplete="off">
       <header class="dialog-header"><h2 id="editor-title">记一笔</h2><button type="button" id="close-editor" class="icon-button" aria-label="关闭" autofocus><svg><use href="#close"/></svg></button></header>
-      <fieldset class="type"><legend class="sr-only">收支类型</legend><label><input type="radio" name="type" value="expense" checked>支出</label><label><input type="radio" name="type" value="income">收入</label></fieldset>
-      <div id="entry-amount-field"></div>
-      <div class="field-grid">
-        <label class="field">分类<select name="category" required></select></label>
-        <label class="field">日期<span class="date-control"><span class="date-display" aria-hidden="true"><span class="date-value">选择日期</span><svg><use href="#calendar"/></svg></span><input name="date" type="date" min="0001-01-01" max="9999-12-31" required></span></label>
-      </div>
-      <div class="location-field">
-        <label for="entry-location">地点</label>
-        <a id="open-amap" class="attachment-action" href="https://www.amap.com/" target="_blank" rel="noopener noreferrer">打开高德地图<svg aria-hidden="true"><use href="#up"/></svg></a>
-        <div class="field"><textarea id="entry-location" name="location" rows="1" autocomplete="off" maxlength="80" placeholder="选填，例如店名或地址"></textarea></div>
-      </div>
-      <label class="field">备注<textarea name="note" rows="1" autocomplete="off" maxlength="80" placeholder="选填"></textarea></label>
-      <div class="photo-field">
-        <div class="photo-heading">
-          <span class="photo-title">账单照片</span>
-          <button type="button" id="upload-photo" class="attachment-action" aria-describedby="photo-status"><svg aria-hidden="true"><use href="#plus"/></svg>上传照片</button>
+      <div id="entry-editor-body" class="record-editor-body">
+        <fieldset class="type"><legend class="sr-only">收支类型</legend><label><input type="radio" name="type" value="expense" checked>支出</label><label><input type="radio" name="type" value="income">收入</label></fieldset>
+        <div id="entry-amount-field"></div>
+        <div class="field-grid">
+          <label class="field">分类<select name="category" required></select></label>
+          <label class="field">日期<span class="date-control"><span class="date-display" aria-hidden="true"><span class="date-value">选择日期</span><svg><use href="#calendar"/></svg></span><input name="date" type="date" min="0001-01-01" max="9999-12-31" required></span></label>
         </div>
-        <input id="photo-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-        <div id="photo-attachment" hidden>
-          <img id="photo-preview" alt="账单照片" width="440" height="220">
-          <button type="button" id="remove-photo" class="danger">移除照片</button>
+        <div class="location-field">
+          <label for="entry-location">地点</label>
+          <a id="open-amap" class="attachment-action" href="https://www.amap.com/" target="_blank" rel="noopener noreferrer">打开高德地图<svg aria-hidden="true"><use href="#up"/></svg></a>
+          <div class="field"><textarea id="entry-location" name="location" rows="1" autocomplete="off" maxlength="80" placeholder="选填，例如店名或地址"></textarea></div>
         </div>
-        <p id="photo-status" role="status"></p>
+        <label class="field">备注<textarea name="note" rows="1" autocomplete="off" maxlength="80" placeholder="选填"></textarea></label>
+        <div class="photo-field">
+          <div class="photo-heading">
+            <span class="photo-title">账单照片</span>
+            <button type="button" id="upload-photo" class="attachment-action" aria-describedby="photo-status"><svg aria-hidden="true"><use href="#plus"/></svg>上传照片</button>
+          </div>
+          <input id="photo-file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+          <div id="photo-attachment" hidden>
+            <img id="photo-preview" alt="账单照片" width="440" height="220">
+            <button type="button" id="remove-photo" class="danger">移除照片</button>
+          </div>
+          <p id="photo-status" role="status"></p>
+        </div>
       </div>
-      <p class="form-error" id="form-error" role="status"></p>
-      <footer class="dialog-footer"><button type="button" id="delete" class="danger" hidden>删除记录</button><button id="save-entry" type="submit" class="primary">保存记录</button></footer>
+      <footer class="dialog-footer">
+        <p class="form-error" id="form-error" role="status"></p>
+        <button type="button" id="delete" class="danger" hidden>删除记录</button><button id="save-entry" type="submit" class="primary">保存记录</button>
+      </footer>
     </form>
   </dialog>
   <div id="amount-keypad" role="group" aria-label="金额数字键盘" hidden>
@@ -670,44 +675,68 @@ function renderEntries(entries) {
   }
 }
 
-function renderChart(entries, total, type) {
-  const label = type === "income" ? "收入" : "支出";
-  $("chart-title").textContent = label + "分类";
-  $("ring-label").textContent = "总" + label;
-  $("ring-total").textContent = money(total);
+function drawChart(rows, { title, description, centerLabel, centerAmount, emptyMessage }) {
+  $("chart-title").textContent = title;
+  $("chart-description").textContent = description;
+  $("ring-label").textContent = centerLabel;
+  $("ring-total").textContent = money(centerAmount);
   const legend = $("legend");
   legend.replaceChildren();
-  const totals = new Map();
-  for (const entry of entries) {
-    totals.set(entry.category, (totals.get(entry.category) ?? 0) + entry.amount);
-  }
-  const ranked = Array.from(totals).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
-  const magnitude = ranked.reduce((sum, [, amount]) => sum + Math.abs(amount), 0);
-  $("chart-description").textContent = ranked.some(([, amount]) => amount < 0)
-    ? "按各类别净" + label + "的绝对值计算占比"
-    : "本月各类别净" + label + "占比";
+  const magnitude = rows.reduce((sum, row) => sum + Math.abs(row.amount), 0);
   const stops = [];
   let current = 0;
-  for (const [category, amount] of ranked) {
+  for (const { label, amount, color } of rows) {
     const percent = magnitude ? Math.abs(amount) / magnitude * 100 : 0;
-    const color = categories[type][category][1];
     if (percent) stops.push(color + " " + current + "% " + (current + percent) + "%");
     current += percent;
     const row = document.createElement("div");
     row.className = "legend-item";
     row.style.setProperty("--dot", color);
     row.innerHTML = "<i></i><span></span><strong></strong><small></small>";
-    row.children[1].textContent = category;
+    row.children[1].textContent = label;
     row.children[2].textContent = money(amount);
     row.children[3].textContent = Math.round(percent) + "%";
     legend.append(row);
   }
   $("ring").style.background = stops.length ? "conic-gradient(" + stops.join(",") + ")" : "";
-  if (!ranked.length) {
+  if (!rows.length) {
     const empty = document.createElement("p");
-    empty.textContent = "本月暂无" + label;
+    empty.textContent = emptyMessage;
     legend.append(empty);
   }
+}
+
+function renderCategoryChart(entries, total, type) {
+  const label = type === "income" ? "收入" : "支出";
+  const totals = new Map();
+  for (const entry of entries) {
+    totals.set(entry.category, (totals.get(entry.category) ?? 0) + entry.amount);
+  }
+  const rows = Array.from(totals, ([name, amount]) => ({
+    label: name, amount, color: categories[type][name][1],
+  })).sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount));
+  drawChart(rows, {
+    title: label + "分类",
+    description: rows.some(({ amount }) => amount < 0)
+      ? "按各类别净" + label + "的绝对值计算占比"
+      : "本月各类别净" + label + "占比",
+    centerLabel: "总" + label,
+    centerAmount: total,
+    emptyMessage: "本月暂无" + label,
+  });
+}
+
+function renderCashFlowChart(income, expense) {
+  const hasNegative = income < 0 || expense < 0;
+  drawChart([
+    { label: "收入合计", amount: income, color: "#188361" },
+    { label: "支出合计", amount: expense, color: "#cb793f" },
+  ], {
+    title: "收支占比",
+    description: hasNegative ? "按本月收入和支出净额的绝对值计算占比" : "本月收入与支出占比",
+    centerLabel: hasNegative ? "绝对值合计" : "收支合计",
+    centerAmount: Math.abs(income) + Math.abs(expense),
+  });
 }
 
 function render() {
@@ -729,8 +758,9 @@ function render() {
   $("demo-bar").hidden = records !== null;
   filters.forEach((button) => button.setAttribute("aria-pressed", button.dataset.filter === filter));
   renderEntries(entries);
-  if (filter === "income") renderChart(incomes, income, "income");
-  else renderChart(expenses, expense, "expense");
+  if (filter === "income") renderCategoryChart(incomes, income, "income");
+  else if (filter === "expense") renderCategoryChart(expenses, expense, "expense");
+  else renderCashFlowChart(income, expense);
 }
 
 function shiftMonth(step) {
@@ -764,6 +794,7 @@ function openEditor(entry) {
   $("delete").hidden = !entry;
   $("form-error").textContent = "";
   editor.showModal();
+  $("entry-editor-body").scrollTop = 0;
 }
 
 const amountKeypad = $("amount-keypad");
@@ -777,12 +808,12 @@ function closeAmountKeypad() {
   activeAmount = null;
 }
 
-function revealAssetKeypad(field) {
-  const dialog = field.button.closest("#asset-editor");
-  if (!dialog) return;
+function revealAmountKeypad(field) {
+  const body = field.button.closest(".record-editor-body");
+  if (!body) return;
+  const dialog = body.closest("dialog");
   requestAnimationFrame(() => {
     if (activeAmount !== field || !dialog.open) return;
-    const body = $("asset-editor-body");
     const viewport = body.getBoundingClientRect();
     const top = viewport.top + 4;
     const bottom = viewport.top + body.clientHeight - 4;
@@ -821,7 +852,7 @@ function createAmountField(container, label, maxDigits, placeholder) {
       amountKeypad.hidden = false;
       button.setAttribute("aria-expanded", "true");
       draw();
-      revealAssetKeypad(field);
+      revealAmountKeypad(field);
     },
     reset(cents) {
       if (activeAmount === field) closeAmountKeypad();
