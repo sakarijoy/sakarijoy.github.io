@@ -173,6 +173,12 @@ dialog::backdrop { background: #102f3b70; }
 .type label:has(:checked) { color: var(--accent); background: #d8eeed; font-weight: 700; }
 .type input { accent-color: var(--accent); }
 .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+.amount-field { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 8px; margin-bottom: 13px; }
+.amount-field .field { margin: 0; }
+#negative-amount { min-height: 40px; }
+#negative-amount[aria-pressed="true"] { background: #d8eeed; border-color: #9eced0; color: var(--accent); }
+.amount-field input[type="number"] { appearance: textfield; }
+.amount-field input::-webkit-inner-spin-button, .amount-field input::-webkit-outer-spin-button { appearance: none; margin: 0; }
 .field { display: grid; gap: 6px; margin-bottom: 13px; min-width: 0; font-size: 13px; font-weight: 650; }
 .field input, .field select, .field textarea { width: 100%; min-width: 0; height: 40px; padding: 7px 9px; border: 1px solid #ccdee1; border-radius: 8px; background: white; color: inherit; font-weight: 400; }
 .field textarea { resize: none; line-height: 24px; }
@@ -288,6 +294,7 @@ dialog::backdrop { background: #102f3b70; }
   .dialog-footer { position: sticky; bottom: 0; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); background: white; }
   .dialog-footer .primary { flex: 1; }
   .field input, .field select, .field textarea { height: 44px; font-size: 16px; }
+  #negative-amount { min-height: 44px; }
   .field textarea { line-height: 28px; }
   #asset-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .asset-preset button { min-height: 44px; font-size: 13px; }
@@ -358,7 +365,7 @@ dialog::backdrop { background: #102f3b70; }
       </div>
       <div class="detail-grid">
         <section class="panel breakdown" aria-labelledby="chart-title">
-          <div class="panel-heading"><div><h2 id="chart-title">支出分类</h2><p>本月各类别支出占比</p></div></div>
+          <div class="panel-heading"><div><h2 id="chart-title">支出分类</h2><p id="chart-description">本月各类别支出占比</p></div></div>
           <div class="ring" id="ring" aria-hidden="true"><div><small>总支出</small><strong id="ring-total">¥0.00</strong></div></div>
           <div id="legend" class="legend"></div>
         </section>
@@ -451,9 +458,12 @@ dialog::backdrop { background: #102f3b70; }
   </dialog>
   <dialog id="editor" aria-labelledby="editor-title">
     <form id="entry-form" autocomplete="off">
-      <header class="dialog-header"><h2 id="editor-title">记一笔</h2><button type="button" id="close-editor" class="icon-button" aria-label="关闭"><svg><use href="#close"/></svg></button></header>
+      <header class="dialog-header"><h2 id="editor-title">记一笔</h2><button type="button" id="close-editor" class="icon-button" aria-label="关闭" autofocus><svg><use href="#close"/></svg></button></header>
       <fieldset class="type"><legend class="sr-only">收支类型</legend><label><input type="radio" name="type" value="expense" checked>支出</label><label><input type="radio" name="type" value="income">收入</label></fieldset>
-      <label class="field">金额（元）<input name="amount" autocomplete="off" inputmode="decimal" pattern="[0-9]+(\.[0-9]{1,2})?" maxlength="12" placeholder="0.00" required></label>
+      <div class="amount-field">
+        <label class="field">金额（元）<input name="amount" type="number" autocomplete="off" inputmode="decimal" min="-999999999.99" max="999999999.99" step="0.01" placeholder="0.00" required></label>
+        <button id="negative-amount" class="secondary" type="button" aria-pressed="false">负数</button>
+      </div>
       <div class="field-grid">
         <label class="field">分类<select name="category" required></select></label>
         <label class="field">日期<span class="date-control"><span class="date-display" aria-hidden="true"><span class="date-value">选择日期</span><svg><use href="#calendar"/></svg></span><input name="date" type="date" min="0001-01-01" max="9999-12-31" required></span></label>
@@ -614,8 +624,9 @@ function renderEntries(entries) {
     }
     row.querySelector(".entry-photo").hidden = !entry.photo;
     const amount = row.querySelector(".entry-amount");
-    amount.textContent = (entry.type === "income" ? "+" : "−") + money(entry.amount);
-    amount.classList.add(entry.type);
+    const cashFlow = entry.type === "income" ? entry.amount : -entry.amount;
+    amount.textContent = (cashFlow < 0 ? "−" : "+") + money(Math.abs(cashFlow));
+    if (cashFlow > 0) amount.classList.add("income");
     if (records === null) {
       row.disabled = true;
       row.classList.add("sample");
@@ -635,13 +646,17 @@ function renderChart(expenses, total) {
   for (const entry of expenses) {
     totals.set(entry.category, (totals.get(entry.category) ?? 0) + entry.amount);
   }
-  const ranked = Array.from(totals).sort((a, b) => b[1] - a[1]);
+  const ranked = Array.from(totals).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+  const magnitude = ranked.reduce((sum, [, amount]) => sum + Math.abs(amount), 0);
+  $("chart-description").textContent = ranked.some(([, amount]) => amount < 0)
+    ? "按各类别净支出的绝对值计算占比"
+    : "本月各类别净支出占比";
   const stops = [];
   let current = 0;
   for (const [category, amount] of ranked) {
-    const percent = amount / total * 100;
+    const percent = magnitude ? Math.abs(amount) / magnitude * 100 : 0;
     const color = categories.expense[category][1];
-    stops.push(color + " " + current + "% " + (current + percent) + "%");
+    if (percent) stops.push(color + " " + current + "% " + (current + percent) + "%");
     current += percent;
     const row = document.createElement("div");
     row.className = "legend-item";
@@ -653,7 +668,7 @@ function renderChart(expenses, total) {
     legend.append(row);
   }
   $("ring").style.background = stops.length ? "conic-gradient(" + stops.join(",") + ")" : "";
-  if (!stops.length) legend.innerHTML = "<p>本月暂无支出</p>";
+  if (!ranked.length) legend.innerHTML = "<p>本月暂无支出</p>";
 }
 
 function render() {
@@ -699,6 +714,7 @@ function openEditor(entry) {
   editingId = entry?.id ?? null;
   fields.type.value = entry?.type ?? "expense";
   fields.amount.value = entry ? (entry.amount / 100).toFixed(2) : "";
+  setNegativeAmount(entry?.amount < 0);
   fields.date.value = entry?.date ?? (month === today.slice(0, 7) ? today : month + "-01");
   syncDateDisplay(fields.date);
   fields.location.value = entry?.location ?? "";
@@ -709,7 +725,34 @@ function openEditor(entry) {
   $("delete").hidden = !entry;
   $("form-error").textContent = "";
   editor.showModal();
-  fields.amount.focus();
+}
+
+const negativeAmountButton = $("negative-amount");
+
+function setNegativeAmount(negative) {
+  negativeAmountButton.setAttribute("aria-pressed", String(negative));
+}
+
+negativeAmountButton.addEventListener("click", () => {
+  const negative = negativeAmountButton.getAttribute("aria-pressed") !== "true";
+  const value = fields.amount.value.replace(/^-/, "");
+  if (value) fields.amount.value = negative ? "-" + value : value;
+  setNegativeAmount(negative);
+});
+
+fields.amount.addEventListener("input", () => {
+  const value = fields.amount.value;
+  if (!value) return;
+  if (value.startsWith("-")) setNegativeAmount(true);
+  else if (negativeAmountButton.getAttribute("aria-pressed") === "true") fields.amount.value = "-" + value;
+});
+
+function parseEntryAmount(value) {
+  const match = value.match(/^(-?)(\d{0,9})(?:\.(\d{1,2}))?$/);
+  if (!match) return null;
+  const [, sign, yuan, fraction = ""] = match;
+  const cents = Number(yuan) * 100 + Number(fraction.padEnd(2, "0"));
+  return cents ? (sign ? -cents : cents) : null;
 }
 
 function syncDateDisplay(input) {
@@ -833,10 +876,9 @@ $("remove-photo").addEventListener("click", () => {
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   if ($("save-entry").disabled) return;
-  const [yuan, fen = ""] = fields.amount.value.split(".");
-  const amount = Number(yuan) * 100 + Number(fen.padEnd(2, "0"));
-  if (!Number.isSafeInteger(amount) || amount < 1 || amount > 99999999999) {
-    $("form-error").textContent = "请输入 0.01 至 999,999,999.99 元之间的金额。";
+  const amount = parseEntryAmount(fields.amount.value);
+  if (amount === null) {
+    $("form-error").textContent = "请输入非零金额，最多保留两位小数。";
     fields.amount.focus();
     return;
   }
@@ -1526,7 +1568,7 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
       if (!isObject(entry) || typeof entry.id !== "string" || !entry.id || entryIds.has(entry.id) ||
         !Object.hasOwn(categories, entry.type) || !Object.hasOwn(categories[entry.type], entry.category) ||
         typeof entry.date !== "string" || !validDate(entry.date) ||
-        !Number.isSafeInteger(entry.amount) || entry.amount < 1 || entry.amount > 99999999999 ||
+        !Number.isSafeInteger(entry.amount) || entry.amount === 0 || Math.abs(entry.amount) > 99999999999 ||
         typeof entry.note !== "string" || (entry.location !== undefined && typeof entry.location !== "string") ||
         (entry.photo !== undefined && (typeof entry.photo !== "string" || entry.photo.length > 160000 ||
           !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(entry.photo)))) return false;
