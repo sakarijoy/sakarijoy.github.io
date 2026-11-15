@@ -157,11 +157,11 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .asset-period, .asset-month-metric { display: grid; gap: 2px; }
 .asset-month-metric { text-align: right; font-variant-numeric: tabular-nums; }
 .asset-period time, .asset-month-delta { color: var(--muted); font-size: .75rem; }
-[data-asset-type] { --group-ink: #435a65; --group-wash: #eef3f5; --group-line: #ccdbe1; }
-[data-asset-type="bank"] { --group-ink: #245985; --group-wash: #ecf5ff; --group-line: #c8deef; }
-[data-asset-type="wallet"] { --group-ink: #086762; --group-wash: #eaf7f4; --group-line: #bfdfd8; }
-[data-asset-type="investment"] { --group-ink: #386030; --group-wash: #eff7ea; --group-line: #d0e3c8; }
-[data-asset-type="credit"] { --group-ink: #82511c; --group-wash: #fff4e6; --group-line: #ebd7bd; }
+[data-asset-type] { --group-ink: #435a65; --group-wash: #eef3f5; --group-line: #ccdbe1; --group-heading-fill: #d7e3e9; }
+[data-asset-type="bank"] { --group-ink: #245985; --group-wash: #ecf5ff; --group-line: #c8deef; --group-heading-fill: #c8e2ff; }
+[data-asset-type="wallet"] { --group-ink: #086762; --group-wash: #eaf7f4; --group-line: #bfdfd8; --group-heading-fill: #b8e9e0; }
+[data-asset-type="investment"] { --group-ink: #386030; --group-wash: #eff7ea; --group-line: #d0e3c8; --group-heading-fill: #daebbc; }
+[data-asset-type="credit"] { --group-ink: #82511c; --group-wash: #fff4e6; --group-line: #ebd7bd; --group-heading-fill: #ffe0b8; }
 .asset-group { min-width: 0; border: 1px solid var(--group-line); border-radius: 9px; background: #fff; }
 .asset-group-heading {
   display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
@@ -173,9 +173,9 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .asset-group dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px 10px; margin: 0; padding: 9px 10px; font-size: .875rem; }
 .asset-group dt { color: var(--muted); overflow-wrap: anywhere; }
 .asset-group dd { margin: 0; text-align: right; }
-.asset-card-body .asset-group { border: 0; border-radius: 0; background: var(--group-wash); }
-.asset-card-body .asset-group-heading { padding: 8px 12px 0; border-radius: 0; }
-.asset-card-body .asset-group dl { padding: 5px 12px 10px; }
+.asset-card-body .asset-group { border: 0; border-radius: 0; }
+.asset-card-body .asset-group-heading { padding: 8px 12px; border-radius: 0; background: var(--group-heading-fill); }
+.asset-card-body .asset-group dl { padding: 8px 12px 10px; }
 .asset-group-inputs { padding: 9px 10px; }
 .asset-group-inputs .field { margin-bottom: 0; }
 .asset-date { width: 100%; min-height: 44px; border: 0; border-top: 1px solid var(--line); border-radius: 0 0 11px 11px; color: var(--accent); background: transparent; font-weight: 680; }
