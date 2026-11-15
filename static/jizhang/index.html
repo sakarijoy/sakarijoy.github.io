@@ -142,10 +142,9 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .asset-summary { grid-template-columns: 1fr 1fr; }
 .asset-summary .metric { display: flex; flex-direction: column; }
 .asset-summary .metric-top { min-height: 35px; }
-.asset-history { min-width: 0; }
 .asset-cards, #asset-fields { display: grid; gap: 10px; }
 .asset-cards:empty { display: none; }
-.asset-card { min-width: 0; border: 1px solid var(--line); border-radius: 12px; }
+.asset-card { min-width: 0; border: 1px solid var(--line); border-radius: 12px; background: white; }
 .asset-card summary {
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto) 9px;
   align-items: center; gap: 10px; padding: 12px; border-radius: 11px; background: #eaf5f6;
@@ -158,7 +157,6 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .asset-period, .asset-month-metric { display: grid; gap: 2px; }
 .asset-month-metric { text-align: right; font-variant-numeric: tabular-nums; }
 .asset-period time, .asset-month-delta { color: var(--muted); font-size: .75rem; }
-.asset-card-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); align-items: start; gap: 8px; padding: 10px; }
 [data-asset-type] { --group-ink: #435a65; --group-wash: #eef3f5; --group-line: #ccdbe1; }
 [data-asset-type="bank"] { --group-ink: #245985; --group-wash: #ecf5ff; --group-line: #c8deef; }
 [data-asset-type="wallet"] { --group-ink: #086762; --group-wash: #eaf7f4; --group-line: #bfdfd8; }
@@ -175,6 +173,9 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .asset-group dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px 10px; margin: 0; padding: 9px 10px; font-size: .875rem; }
 .asset-group dt { color: var(--muted); overflow-wrap: anywhere; }
 .asset-group dd { margin: 0; text-align: right; }
+.asset-card-body .asset-group { border: 0; border-radius: 0; background: var(--group-wash); }
+.asset-card-body .asset-group-heading { padding: 8px 12px 0; border-radius: 0; }
+.asset-card-body .asset-group dl { padding: 5px 12px 10px; }
 .asset-group-inputs { padding: 9px 10px; }
 .asset-group-inputs .field { margin-bottom: 0; }
 .asset-date { width: 100%; min-height: 44px; border: 0; border-top: 1px solid var(--line); border-radius: 0 0 11px 11px; color: var(--accent); background: transparent; font-weight: 680; }
@@ -317,7 +318,7 @@ dialog::backdrop { background: #102f3b70; }
   .metric small, .entry-label small, .ring small { font-size: .75rem; }
   .primary, .secondary, .legend-item, .month-picker { font-size: .875rem; }
   .field, .asset-presets-heading h3, .asset-selected-title, .photo-title { font-size: .875rem; }
-  .asset-card-body, .asset-group-inputs { grid-template-columns: minmax(0, 1fr); }
+  .asset-group-inputs { grid-template-columns: minmax(0, 1fr); }
   dialog, #asset-editor, #asset-columns-editor { position: fixed; inset: auto 0 0; box-sizing: border-box; width: 100%; min-width: 0; max-width: 100vw; max-height: 92dvh; margin: 0; padding: 12px max(14px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); border-radius: 18px 18px 0 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
   #asset-editor.record-editor[open] { overflow: hidden; }
   dialog form { min-width: 0; }
@@ -447,7 +448,7 @@ dialog::backdrop { background: #102f3b70; }
             <strong id="latest-asset-change">—</strong><small id="asset-comparison">保存相邻两个月后计算差值</small>
           </article>
         </div>
-        <section class="panel asset-history" aria-labelledby="asset-history-title">
+        <section aria-labelledby="asset-history-title">
           <div class="panel-heading"><div><h2 id="asset-history-title">月度资产明细</h2><p>金额单位为元。</p></div></div>
           <div id="asset-cards" class="asset-cards"></div>
           <div class="empty" id="no-assets"><svg aria-hidden="true"><use href="#wallet"/></svg><p>还没有资产记录</p></div>
