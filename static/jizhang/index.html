@@ -49,7 +49,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 main { --page-gutter: clamp(26px, 4vw, 64px); display: grid; grid-template-rows: auto minmax(0, 1fr); width: 100%; min-width: 0; min-height: 0; max-width: 1480px; margin-inline: auto; }
 .page-content { min-width: 0; min-height: 0; overflow: hidden auto; overscroll-behavior-y: contain; padding: 16px var(--page-gutter) 34px; }
 .page-header, .header-actions, .month-switch, .month-picker, .metric-top, .panel-heading { display: flex; align-items: center; }
-.page-header { min-height: 66px; padding: 9px var(--page-gutter); background: #f2f8f8; border-bottom: 1px solid var(--line); }
+.page-header { --toolbar-control-height: 46px; padding: 9px var(--page-gutter); background: #f2f8f8; border-bottom: 1px solid var(--line); }
 .ledger-search { margin-top: 10px; }
 .backup-note { margin: 8px 0 12px; font-size: .875rem; color: var(--muted); }
 .backup-note:empty { display: none; }
@@ -57,7 +57,16 @@ main { --page-gutter: clamp(26px, 4vw, 64px); display: grid; grid-template-rows:
 #restore-backup { min-height: 44px; }
 h1, h2, p { margin: 0; }
 .header-actions { width: 100%; min-width: 0; justify-content: space-between; gap: 8px; }
-.page-header :is(.primary, .secondary, .month-switch, .filters) { min-height: 46px; }
+.page-header .header-actions > * { height: var(--toolbar-control-height); min-height: 0; }
+.page-header :is(.primary, .secondary, .month-picker, .plan-period, .filters button[aria-pressed]) {
+  font-size: .875rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+.page-header .filters { padding-block: 0; }
+.page-header .filters button { min-height: 0; }
+.page-header .month-switch button { height: 100%; }
+.page-header .plan-period { color: #325761; }
 .month-switch { border: 1px solid var(--line); background: white; border-radius: 10px; min-height: 43px; }
 .month-switch button, .icon-button { display: grid; place-items: center; width: 34px; height: 39px; background: transparent; border: 0; border-radius: 8px; color: var(--muted); }
 .month-switch button:hover, .icon-button:hover { color: var(--accent); background: #e8f6f5; }
@@ -128,8 +137,7 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .budget-bar { position: absolute; inset-block: 0; border-radius: 4px; background: #497ebf; }
 .budget-line.actual .budget-bar { background: var(--accent); }
 .budget-track.negative-scale::after { content: ""; position: absolute; left: var(--zero); top: -2px; bottom: -2px; border-left: 1px solid #849ba4; }
-.plan-actions { flex-wrap: wrap; }
-.plan-period { min-width: 6.5em; padding-inline: 4px; text-align: center; font-size: .875rem; white-space: nowrap; }
+.plan-period { min-width: 6.5em; padding-inline: 4px; text-align: center; white-space: nowrap; }
 .demo-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 18px; background: #e2f2f5; border-radius: 10px; padding: 8px 14px; color: #285c66; font-size: 12px; }
 .demo-bar span, .demo-bar button { display: inline-flex; align-items: center; gap: 7px; }
 .demo-bar svg { width: 15px; height: 15px; }
@@ -259,12 +267,10 @@ dialog::backdrop { background: #102f3b70; }
   .page-nav a.nav.active { background: transparent; color: var(--accent); }
   .page-nav a.nav.active::before { content: ""; position: absolute; inset: 0 0 auto; width: 29px; height: 3px; margin-inline: auto; border-radius: 0 0 5px 5px; background: var(--accent); }
   .notice { bottom: calc(var(--mobile-nav-height) + 9px); z-index: 4; }
-  .page-header { min-height: 65px; }
   .page-header .month-switch button { width: 36px; }
   .page-header .primary { padding-inline: 12px; }
-  .page-header .plan-actions { flex-wrap: nowrap; }
   .plan-actions .filters button { padding-inline: 6px; }
-  .plan-period { min-width: 0; font-size: .8125rem; }
+  .plan-period { min-width: 0; }
   .brand strong, h2 { font-size: 1.125rem; }
   .brand strong, h2 { letter-spacing: normal; }
   #assets .header-actions > button { flex: 1; }
