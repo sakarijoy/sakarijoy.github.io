@@ -21,6 +21,7 @@
   --line: #dce9eb;
 }
 * { box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
 body { margin: 0; min-width: 300px; }
 svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .symbols, [hidden] { display: none !important; }
@@ -29,8 +30,8 @@ button, input, select, textarea { font: inherit; }
 button { cursor: pointer; color: inherit; }
 button:disabled { cursor: default; opacity: .45; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .month-picker:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
-.app { display: grid; grid-template-columns: 228px minmax(0, 1fr); min-height: 100vh; }
-.sidebar { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; padding: 35px 19px 23px; background: #fff; border-right: 1px solid var(--line); }
+.app { display: grid; grid-template-columns: 228px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); height: 100vh; height: 100dvh; overflow: hidden; }
+.sidebar { min-height: 0; display: flex; flex-direction: column; padding: 35px 19px 23px; background: #fff; border-right: 1px solid var(--line); }
 .brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; }
 .brand-icon { display: grid; place-items: center; border-radius: 13px; width: 42px; height: 42px; color: #fff; background: linear-gradient(140deg,#38aeb5,#087068); box-shadow: 0 4px 12px #167d8540; }
 .brand-icon svg { width: 24px; height: 24px; }
@@ -45,16 +46,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .nav svg { width: 18px; height: 18px; }
 .privacy { margin-top: auto; padding: 17px 4px 0; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
 .privacy svg { width: 16px; height: 16px; }
-main { width: 100%; min-width: 0; max-width: 1480px; margin-inline: auto; padding: 44px clamp(26px,4vw,64px) 34px; }
+main { --page-gutter: clamp(26px, 4vw, 64px); display: grid; grid-template-rows: auto minmax(0, 1fr); width: 100%; min-width: 0; min-height: 0; max-width: 1480px; margin-inline: auto; }
+.page-content { min-width: 0; min-height: 0; overflow: hidden auto; overscroll-behavior-y: contain; padding: 16px var(--page-gutter) 34px; }
 .page-header, .header-actions, .month-switch, .month-picker, .metric-top, .panel-heading { display: flex; align-items: center; }
-.page-header { justify-content: space-between; gap: 22px; margin-bottom: 29px; }
+.page-header { min-height: 66px; padding: 9px var(--page-gutter); background: #f2f8f8; border-bottom: 1px solid var(--line); }
 .ledger-search { margin-top: 10px; }
 .backup-note { margin: 8px 0 12px; font-size: .875rem; color: var(--muted); }
 .backup-note:empty { display: none; }
 .backup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 #restore-backup { min-height: 44px; }
 h1, h2, p { margin: 0; }
-.header-actions { gap: 12px; }
+.header-actions { width: 100%; min-width: 0; justify-content: space-between; gap: 8px; }
+.page-header :is(.primary, .secondary, .month-switch, .filters) { min-height: 46px; }
 .month-switch { border: 1px solid var(--line); background: white; border-radius: 10px; min-height: 43px; }
 .month-switch button, .icon-button { display: grid; place-items: center; width: 34px; height: 39px; background: transparent; border: 0; border-radius: 8px; color: var(--muted); }
 .month-switch button:hover, .icon-button:hover { color: var(--accent); background: #e8f6f5; }
@@ -227,34 +230,26 @@ dialog::backdrop { background: #102f3b70; }
 @media (max-width: 1050px) {
   .app { grid-template-columns: 178px minmax(0,1fr); }
   .sidebar { padding-inline: 12px; }
-  main { padding-inline: 24px; }
+  main { --page-gutter: 24px; }
 }
 @media (max-width: 840px) {
-  .app { display: block; }
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
   .sidebar { position: relative; height: auto; flex-direction: row; flex-wrap: wrap; gap: 9px; justify-content: space-between; align-items: center; padding: 11px 18px; border-right: 0; border-bottom: 1px solid var(--line); }
   .brand { padding: 0; }
   .side-actions { margin: 0; display: flex; flex-wrap: wrap; gap: 4px; }
   .page-nav { display: flex; gap: 4px; }
   .side-actions .nav { padding: 8px; gap: 5px; }
   .privacy { display: none; }
-  main { padding-top: 26px; }
 }
 @media (max-width: 620px) {
-  html, body { height: 100%; overflow: hidden; }
   html, body, main, dialog, button, a, input, select, textarea { touch-action: manipulation; touch-action: pan-x pan-y; }
   .app {
     --mobile-nav-height: calc(44px + env(safe-area-inset-bottom));
     --mobile-gutter: max(14px, env(safe-area-inset-left), env(safe-area-inset-right));
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
-    height: 100vh;
-    height: 100dvh;
-    min-height: 0;
     padding-bottom: var(--mobile-nav-height);
-    overflow: hidden;
   }
-  main { min-height: 0; overflow-y: auto; scrollbar-width: none; overscroll-behavior-y: contain; padding: 0 var(--mobile-gutter) 16px; }
+  main { --page-gutter: var(--mobile-gutter); }
+  .page-content { scrollbar-width: none; padding-block: 12px 16px; }
   .sidebar { padding: calc(5px + env(safe-area-inset-top)) var(--mobile-gutter) 5px; min-height: calc(52px + env(safe-area-inset-top)); }
   .brand-icon { width: 36px; height: 36px; }
   .brand small { display: none; }
@@ -264,10 +259,14 @@ dialog::backdrop { background: #102f3b70; }
   .page-nav a.nav.active { background: transparent; color: var(--accent); }
   .page-nav a.nav.active::before { content: ""; position: absolute; inset: 0 0 auto; width: 29px; height: 3px; margin-inline: auto; border-radius: 0 0 5px 5px; background: var(--accent); }
   .notice { bottom: calc(var(--mobile-nav-height) + 9px); z-index: 4; }
-  .page-header { position: sticky; top: 0; z-index: 1; width: calc(100% + 2 * var(--mobile-gutter)); align-items: start; flex-direction: column; gap: 8px; margin: 0 calc(-1 * var(--mobile-gutter)) 12px; padding: 9px var(--mobile-gutter) 10px; background: #f2f8f8; border-bottom: 1px solid var(--line); }
+  .page-header { min-height: 65px; }
+  .page-header .month-switch button { width: 36px; }
+  .page-header .primary { padding-inline: 12px; }
+  .page-header .plan-actions { flex-wrap: nowrap; }
+  .plan-actions .filters button { padding-inline: 6px; }
+  .plan-period { min-width: 0; font-size: .8125rem; }
   .brand strong, h2 { font-size: 1.125rem; }
   .brand strong, h2 { letter-spacing: normal; }
-  .header-actions { width: 100%; justify-content: space-between; gap: 8px; }
   #assets .header-actions > button { flex: 1; }
   .primary, .secondary, .filters button, .type label, .attachment-action, .asset-column-form .danger { min-height: 44px; }
   .month-switch button, .icon-button { width: 44px; height: 44px; }
@@ -373,41 +372,43 @@ dialog::backdrop { background: #102f3b70; }
           <button class="primary" id="add" type="button"><svg><use href="#plus"/></svg>记一笔</button>
         </div>
       </header>
-      <div class="summary" aria-label="本月收支" aria-live="polite">
-        <article class="metric balance">
-          <div class="metric-top"><span>本月结余</span><span class="metric-icon"><svg><use href="#wallet"/></svg></span></div>
-          <strong id="balance">¥0.00</strong><small>本月收入 − 本月支出</small>
-        </article>
-        <button type="button" class="metric metric-filter" data-filter="income" aria-pressed="false" aria-controls="ledger-chart ledger-details">
-          <span class="metric-top"><span>本月收入</span><span class="metric-icon income"><svg aria-hidden="true"><use href="#down"/></svg></span></span>
-          <strong id="income">¥0.00</strong><small id="income-count"></small>
-        </button>
-        <button type="button" class="metric metric-filter" data-filter="expense" aria-pressed="false" aria-controls="ledger-chart ledger-details">
-          <span class="metric-top"><span>本月支出</span><span class="metric-icon expense"><svg aria-hidden="true"><use href="#up"/></svg></span></span>
-          <strong id="expense">¥0.00</strong><small id="expense-count"></small>
-        </button>
-      </div>
-      <div class="detail-grid">
-        <section id="ledger-chart" class="panel breakdown" aria-labelledby="chart-title">
-          <div class="panel-heading"><div><h2 id="chart-title">支出计划</h2><p id="chart-description">按分类对比本月计划与实际支出</p></div><button id="edit-budget" class="secondary" type="button">设置计划</button></div>
-          <div id="budget-chart" class="budget-chart" aria-labelledby="chart-title"></div>
-          <div class="ring" id="ring" aria-hidden="true" hidden><div><small id="ring-label"></small><strong id="ring-total"></strong></div></div>
-          <div id="legend" class="legend" hidden></div>
-        </section>
-        <section id="ledger-details" class="panel ledger" aria-labelledby="ledger-title">
-          <div class="panel-heading">
-            <div><h2 id="ledger-title">账单明细</h2><p id="ledger-count"></p></div>
-            <div class="filters" aria-label="筛选收支">
-              <button type="button" data-filter="all" aria-pressed="true">全部</button>
-              <button type="button" data-filter="expense" aria-pressed="false">支出</button>
-              <button type="button" data-filter="income" aria-pressed="false">收入</button>
+      <div class="page-content">
+        <div class="summary" aria-label="本月收支" aria-live="polite">
+          <article class="metric balance">
+            <div class="metric-top"><span>本月结余</span><span class="metric-icon"><svg><use href="#wallet"/></svg></span></div>
+            <strong id="balance">¥0.00</strong><small>本月收入 − 本月支出</small>
+          </article>
+          <button type="button" class="metric metric-filter" data-filter="income" aria-pressed="false" aria-controls="ledger-chart ledger-details">
+            <span class="metric-top"><span>本月收入</span><span class="metric-icon income"><svg aria-hidden="true"><use href="#down"/></svg></span></span>
+            <strong id="income">¥0.00</strong><small id="income-count"></small>
+          </button>
+          <button type="button" class="metric metric-filter" data-filter="expense" aria-pressed="true" aria-controls="ledger-chart ledger-details">
+            <span class="metric-top"><span>本月支出</span><span class="metric-icon expense"><svg aria-hidden="true"><use href="#up"/></svg></span></span>
+            <strong id="expense">¥0.00</strong><small id="expense-count"></small>
+          </button>
+        </div>
+        <div class="detail-grid">
+          <section id="ledger-chart" class="panel breakdown" aria-labelledby="chart-title">
+            <div class="panel-heading"><div><h2 id="chart-title">支出分类</h2><p id="chart-description">本月各类别净支出占比</p></div><button id="edit-budget" class="secondary" type="button" hidden>设置计划</button></div>
+            <div id="budget-chart" class="budget-chart" aria-labelledby="chart-title" hidden></div>
+            <div class="ring" id="ring" aria-hidden="true"><div><small id="ring-label">总支出</small><strong id="ring-total">¥0.00</strong></div></div>
+            <div id="legend" class="legend"></div>
+          </section>
+          <section id="ledger-details" class="panel ledger" aria-labelledby="ledger-title">
+            <div class="panel-heading">
+              <div><h2 id="ledger-title">账单明细</h2><p id="ledger-count"></p></div>
+              <div class="filters" aria-label="筛选收支">
+                <button type="button" data-filter="all" aria-pressed="false">全部</button>
+                <button type="button" data-filter="expense" aria-pressed="true">支出</button>
+                <button type="button" data-filter="income" aria-pressed="false">收入</button>
+              </div>
             </div>
-          </div>
-          <label class="field ledger-search">搜索本月账单<input id="ledger-search" type="search" autocomplete="off" placeholder="备注、地点或分类"></label>
-          <div id="entries"></div>
-        </section>
+            <label class="field ledger-search">搜索本月账单<input id="ledger-search" type="search" autocomplete="off" placeholder="备注、地点或分类"></label>
+            <div id="entries"></div>
+          </section>
+        </div>
+        <div id="demo-bar" class="demo-bar" hidden><span><svg><use href="#spark"/></svg>正在查看示例账本</span><button id="clear-demo" type="button">开始记自己的账 <svg><use href="#right"/></svg></button></div>
       </div>
-      <div id="demo-bar" class="demo-bar" hidden><span><svg><use href="#spark"/></svg>正在查看示例账本</span><button id="clear-demo" type="button">开始记自己的账 <svg><use href="#right"/></svg></button></div>
     </main>
     <main id="assets" aria-labelledby="assets-page-name" hidden>
       <h2 id="assets-page-name" class="sr-only">月度资产</h2>
@@ -417,27 +418,29 @@ dialog::backdrop { background: #102f3b70; }
           <button id="add-asset-month" class="primary" type="button"><svg aria-hidden="true"><use href="#plus"/></svg>记录资产</button>
         </div>
       </header>
-      <div class="summary asset-summary" aria-live="polite">
-        <article class="metric balance">
-          <div class="metric-top"><span>最近资产总额</span><span class="metric-icon"><svg aria-hidden="true"><use href="#wallet"/></svg></span></div>
-          <strong id="latest-asset-total">—</strong><small id="latest-asset-month">暂无记录</small>
-        </article>
-        <article class="metric">
-          <div class="metric-top"><span>较上月变化</span></div>
-          <strong id="latest-asset-change">—</strong><small id="asset-comparison">保存相邻两个月后计算差值</small>
-        </article>
-      </div>
-      <section class="panel asset-history" aria-labelledby="asset-history-title">
-        <div class="panel-heading"><div><h2 id="asset-history-title">月度资产明细</h2><p>金额单位为元。</p></div></div>
-        <div class="asset-table-scroll" id="asset-table-scroll" tabindex="0" role="region" aria-label="各账户的资产记录，可横向滚动" hidden>
-          <table class="asset-table">
-            <thead><tr id="asset-columns"><th scope="col">记录日期</th></tr></thead>
-            <tbody id="asset-rows"></tbody>
-          </table>
+      <div class="page-content">
+        <div class="summary asset-summary" aria-live="polite">
+          <article class="metric balance">
+            <div class="metric-top"><span>最近资产总额</span><span class="metric-icon"><svg aria-hidden="true"><use href="#wallet"/></svg></span></div>
+            <strong id="latest-asset-total">—</strong><small id="latest-asset-month">暂无记录</small>
+          </article>
+          <article class="metric">
+            <div class="metric-top"><span>较上月变化</span></div>
+            <strong id="latest-asset-change">—</strong><small id="asset-comparison">保存相邻两个月后计算差值</small>
+          </article>
         </div>
-        <div id="asset-cards" class="asset-cards"></div>
-        <div class="empty" id="no-assets"><svg aria-hidden="true"><use href="#wallet"/></svg><p>还没有资产记录</p></div>
-      </section>
+        <section class="panel asset-history" aria-labelledby="asset-history-title">
+          <div class="panel-heading"><div><h2 id="asset-history-title">月度资产明细</h2><p>金额单位为元。</p></div></div>
+          <div class="asset-table-scroll" id="asset-table-scroll" tabindex="0" role="region" aria-label="各账户的资产记录，可横向滚动" hidden>
+            <table class="asset-table">
+              <thead><tr id="asset-columns"><th scope="col">记录日期</th></tr></thead>
+              <tbody id="asset-rows"></tbody>
+            </table>
+          </div>
+          <div id="asset-cards" class="asset-cards"></div>
+          <div class="empty" id="no-assets"><svg aria-hidden="true"><use href="#wallet"/></svg><p>还没有资产记录</p></div>
+        </section>
+      </div>
     </main>
     <main id="plans" aria-labelledby="plans-page-name" hidden>
       <h2 id="plans-page-name" class="sr-only">支出计划</h2>
@@ -454,10 +457,12 @@ dialog::backdrop { background: #102f3b70; }
           </div>
         </div>
       </header>
-      <section class="panel breakdown" aria-labelledby="plan-chart-title">
-        <div class="panel-heading"><div><h2 id="plan-chart-title">计划与实际</h2><p>年计划和月计划分别设置。</p></div><button id="edit-period-budget" type="button" class="secondary">设置计划</button></div>
-        <div id="plan-chart" class="budget-chart"></div>
-      </section>
+      <div class="page-content">
+        <section class="panel breakdown" aria-labelledby="plan-chart-title">
+          <div class="panel-heading"><div><h2 id="plan-chart-title">计划与实际</h2><p>年计划和月计划分别设置。</p></div><button id="edit-period-budget" type="button" class="secondary">设置计划</button></div>
+          <div id="plan-chart" class="budget-chart"></div>
+        </section>
+      </div>
     </main>
     <p id="notice" class="notice" role="status"></p>
   </div>
@@ -601,7 +606,7 @@ const today = new Intl.DateTimeFormat("sv-SE", {
   year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Asia/Shanghai",
 }).format();
 let month = today.slice(0, 7);
-let filter = "all";
+let filter = "expense";
 let planMode = "month";
 let planMonth = month;
 let planYear = month.slice(0, 4);
