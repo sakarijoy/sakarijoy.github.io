@@ -379,7 +379,7 @@ dialog::backdrop { background: #102f3b70; }
             <span class="metric-top"><span>本月收入</span><span class="metric-icon income"><svg aria-hidden="true"><use href="#down"/></svg></span></span>
             <strong id="income">¥0.00</strong><small id="income-count"></small>
           </button>
-          <button type="button" class="metric metric-filter" data-filter="expense" aria-pressed="true" aria-controls="ledger-chart ledger-details">
+          <button type="button" class="metric metric-filter" data-filter="expense" aria-pressed="false" aria-controls="ledger-chart ledger-details">
             <span class="metric-top"><span>本月支出</span><span class="metric-icon expense"><svg aria-hidden="true"><use href="#up"/></svg></span></span>
             <strong id="expense">¥0.00</strong><small id="expense-count"></small>
           </button>
@@ -390,16 +390,16 @@ dialog::backdrop { background: #102f3b70; }
         </section>
         <div class="detail-grid">
           <section id="ledger-chart" class="panel breakdown" aria-labelledby="chart-title">
-            <div class="panel-heading"><div><h2 id="chart-title">支出分类</h2><p id="chart-description">本月各类别净支出占比</p></div></div>
-            <div class="ring" id="ring" aria-hidden="true"><div><small id="ring-label">总支出</small><strong id="ring-total">¥0.00</strong></div></div>
+            <div class="panel-heading"><div><h2 id="chart-title">额度概览</h2><p id="chart-description">本月净支出占计划额度的比例</p></div></div>
+            <div class="ring" id="ring"><div><small id="ring-label">未设置额度</small><strong id="ring-total">—</strong></div></div>
             <div id="legend" class="legend"></div>
           </section>
           <section id="ledger-details" class="panel ledger" aria-labelledby="ledger-title">
             <div class="panel-heading">
               <div><h2 id="ledger-title">账单明细</h2><p id="ledger-count"></p></div>
               <div class="filters" aria-label="筛选收支">
-                <button type="button" data-filter="all" aria-pressed="false">全部</button>
-                <button type="button" data-filter="expense" aria-pressed="true">支出</button>
+                <button type="button" data-filter="all" aria-pressed="true">全部</button>
+                <button type="button" data-filter="expense" aria-pressed="false">支出</button>
                 <button type="button" data-filter="income" aria-pressed="false">收入</button>
               </div>
             </div>
@@ -585,7 +585,7 @@ const today = new Intl.DateTimeFormat("sv-SE", {
   year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Asia/Shanghai",
 }).format();
 let month = today.slice(0, 7);
-let filter = "expense";
+let filter = "all";
 let editingId = null;
 let noticeTimer;
 let entryPoint = null;
@@ -779,7 +779,7 @@ function renderBudgetProgress(expense, limit) {
   const over = limit !== null && used > limit;
   const fill = over ? "#b84c43" : "#0d706c";
   const arc = Math.min(fraction, 1) * 100 + "%";
-  $("chart-title").textContent = "额度使用率";
+  $("chart-title").textContent = "额度概览";
   $("chart-description").textContent = limit === null
     ? "设置本月支出额度后即可查看使用率。"
     : "本月净支出占计划额度的比例";
