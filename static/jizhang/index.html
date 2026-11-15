@@ -118,6 +118,17 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .legend-item { display: grid; grid-template-columns: 8px minmax(0,1fr) auto auto; gap: 8px; align-items: center; font-size: 12px; }
 .legend-item i { width: 8px; height: 8px; border-radius: 50%; background: var(--dot); }
 .legend-item small { min-width: 34px; text-align: right; color: var(--muted); }
+.budget-chart { grid-column: 1 / -1; display: grid; gap: 14px; }
+.budget-category { padding-top: 10px; border-top: 1px solid var(--line); }
+.budget-category h3 { margin: 0 0 6px; font-size: .9375rem; }
+.budget-line { display: grid; grid-template-columns: 4.25em minmax(0, 1fr) 12ch; align-items: center; gap: 7px; margin-top: 5px; font-size: .8125rem; }
+.budget-line strong { text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.budget-track { position: relative; height: 10px; border-radius: 4px; background: #edf4f6; }
+.budget-bar { position: absolute; inset-block: 0; border-radius: 4px; background: #497ebf; }
+.budget-line.actual .budget-bar { background: var(--accent); }
+.budget-track.negative-scale::after { content: ""; position: absolute; left: var(--zero); top: -2px; bottom: -2px; border-left: 1px solid #849ba4; }
+.plan-actions { flex-wrap: wrap; }
+.plan-period { min-width: 6.5em; padding-inline: 4px; text-align: center; font-size: .875rem; white-space: nowrap; }
 .demo-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 18px; background: #e2f2f5; border-radius: 10px; padding: 8px 14px; color: #285c66; font-size: 12px; }
 .demo-bar span, .demo-bar button { display: inline-flex; align-items: center; gap: 7px; }
 .demo-bar svg { width: 15px; height: 15px; }
@@ -143,12 +154,12 @@ h2 { font-size: 17px; letter-spacing: -.02em; }
 .asset-positive { color: #16815d; }
 .asset-negative { color: #a5333e; }
 #asset-editor { width: min(560px, calc(100% - 28px)); }
-:is(#asset-editor, #editor)[open] { display: flex; flex-direction: column; overflow: hidden; }
-:is(#asset-form, #entry-form) { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
-:is(#asset-editor, #editor) :is(.dialog-header, .dialog-footer) { position: static; }
-:is(#asset-editor, #editor) .dialog-header { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
-:is(#asset-editor, #editor) .dialog-footer { flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--line); }
-:is(#asset-editor, #editor) .form-error { flex-basis: 100%; margin: 0 0 6px; }
+.record-editor[open] { display: flex; flex-direction: column; overflow: hidden; }
+.record-editor > form { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.record-editor :is(.dialog-header, .dialog-footer) { position: static; }
+.record-editor .dialog-header { padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.record-editor .dialog-footer { flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--line); }
+.record-editor .form-error { flex-basis: 100%; margin: 0 0 6px; }
 .record-editor-body { min-height: 0; overflow: hidden auto; overscroll-behavior-y: contain; padding: 10px 4px 4px; }
 #entry-editor-body .type { margin-top: 0; }
 .asset-form-hint { margin-bottom: 14px; color: var(--muted); font-size: 12px; }
@@ -249,7 +260,7 @@ dialog::backdrop { background: #102f3b70; }
   .sidebar { padding: calc(5px + env(safe-area-inset-top)) var(--mobile-gutter) 5px; min-height: calc(52px + env(safe-area-inset-top)); }
   .brand-icon { width: 36px; height: 36px; }
   .brand small { display: none; }
-  .page-nav { position: fixed; z-index: 3; inset: auto 0 0; height: var(--mobile-nav-height); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 var(--mobile-gutter) env(safe-area-inset-bottom); border-top: 1px solid var(--line); background: white; }
+  .page-nav { position: fixed; z-index: 3; inset: auto 0 0; height: var(--mobile-nav-height); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 0 var(--mobile-gutter) env(safe-area-inset-bottom); border-top: 1px solid var(--line); background: white; }
   .page-nav a.nav { position: relative; min-height: 0; justify-content: center; gap: 6px; padding: 4px; border-radius: 0; font-size: 12px; }
   .page-nav a.nav svg { width: 17px; height: 17px; }
   .page-nav a.nav.active { background: transparent; color: var(--accent); }
@@ -296,6 +307,7 @@ dialog::backdrop { background: #102f3b70; }
   .asset-card dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
   .asset-card .asset-date { min-height: 44px; width: 100%; border-top: 1px solid var(--line); }
   dialog, #asset-editor, #asset-columns-editor { position: fixed; inset: auto 0 0; box-sizing: border-box; width: 100%; min-width: 0; max-width: 100vw; max-height: 92dvh; margin: 0; padding: 12px max(14px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); border-radius: 18px 18px 0 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+  #asset-editor.record-editor[open] { overflow: hidden; }
   dialog form { min-width: 0; }
   #editor .field-grid { gap: 8px; }
   .date-control { position: relative; display: block; min-width: 0; width: 100%; max-width: 100%; overflow: hidden; border-radius: 8px; }
@@ -311,7 +323,7 @@ dialog::backdrop { background: #102f3b70; }
   .field input, .field select, .field textarea { height: 44px; font-size: 16px; }
   .amount-display { min-height: 44px; font-size: 16px; }
   .field textarea { line-height: 28px; }
-  #asset-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  #asset-fields, #budget-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .asset-preset button { min-height: 44px; font-size: 13px; }
   .asset-preset { grid-template-columns: minmax(0, 1fr) 44px; }
 }
@@ -347,6 +359,7 @@ dialog::backdrop { background: #102f3b70; }
         <nav class="page-nav" aria-label="账本页面">
           <a id="nav-overview" href="#overview" class="nav active" aria-current="page"><svg aria-hidden="true"><use href="#grid"/></svg><span>账本概览</span></a>
           <a id="nav-assets" href="#assets" class="nav"><svg aria-hidden="true"><use href="#wallet"/></svg><span>月度资产</span></a>
+          <a id="nav-plans" href="#plans" class="nav"><svg aria-hidden="true"><use href="#calendar"/></svg><span>支出计划</span></a>
         </nav>
         <button class="nav" id="export" type="button"><svg><use href="#download"/></svg><span>导出本月</span></button>
       </div>
@@ -380,9 +393,10 @@ dialog::backdrop { background: #102f3b70; }
       </div>
       <div class="detail-grid">
         <section id="ledger-chart" class="panel breakdown" aria-labelledby="chart-title">
-          <div class="panel-heading"><div><h2 id="chart-title">收支占比</h2><p id="chart-description">本月收入与支出占比</p></div></div>
-          <div class="ring" id="ring" aria-hidden="true"><div><small id="ring-label">收支合计</small><strong id="ring-total">¥0.00</strong></div></div>
-          <div id="legend" class="legend"></div>
+          <div class="panel-heading"><div><h2 id="chart-title">支出计划</h2><p id="chart-description">按分类对比本月计划与实际支出</p></div><button id="edit-budget" class="secondary" type="button">设置计划</button></div>
+          <div id="budget-chart" class="budget-chart" aria-labelledby="chart-title"></div>
+          <div class="ring" id="ring" aria-hidden="true" hidden><div><small id="ring-label"></small><strong id="ring-total"></strong></div></div>
+          <div id="legend" class="legend" hidden></div>
         </section>
         <section id="ledger-details" class="panel ledger" aria-labelledby="ledger-title">
           <div class="panel-heading">
@@ -429,11 +443,31 @@ dialog::backdrop { background: #102f3b70; }
         <div class="empty" id="no-assets"><svg aria-hidden="true"><use href="#wallet"/></svg><p>还没有资产记录</p></div>
       </section>
     </main>
+    <main id="plans" hidden>
+      <header class="page-header">
+        <div><h2 class="page-title">支出计划</h2><p>按月和按年对比计划与实际支出。</p></div>
+        <div class="header-actions plan-actions">
+          <div class="filters" role="group" aria-label="计划周期">
+            <button type="button" data-plan-mode="month" aria-pressed="true">月计划</button>
+            <button type="button" data-plan-mode="year" aria-pressed="false">年计划</button>
+          </div>
+          <div class="month-switch">
+            <button id="plan-prev" type="button" aria-label="上一周期"><svg aria-hidden="true"><use href="#left"/></svg></button>
+            <span id="plan-period" class="plan-period" aria-live="polite"></span>
+            <button id="plan-next" type="button" aria-label="下一周期"><svg aria-hidden="true"><use href="#right"/></svg></button>
+          </div>
+        </div>
+      </header>
+      <section class="panel breakdown" aria-labelledby="plan-chart-title">
+        <div class="panel-heading"><div><h2 id="plan-chart-title">计划与实际</h2><p>年计划和月计划分别设置。</p></div><button id="edit-period-budget" type="button" class="secondary">设置计划</button></div>
+        <div id="plan-chart" class="budget-chart"></div>
+      </section>
+    </main>
     <p id="notice" class="notice" role="status"></p>
   </div>
   <dialog id="backup-dialog" aria-labelledby="backup-title">
     <header class="dialog-header"><h2 id="backup-title">备份与恢复</h2><button id="close-backup" class="icon-button" type="button" aria-label="关闭"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
-    <p class="backup-note">备份包含账单、照片和月度资产。恢复会替换当前浏览器里的账本。</p>
+    <p class="backup-note">备份包含账单、照片、月度资产和支出计划。恢复前请确认备份内容。</p>
     <div class="backup-actions">
       <button id="download-backup" class="primary" type="button">下载备份</button>
       <button id="choose-backup" class="secondary" type="button">选择备份文件</button>
@@ -443,7 +477,20 @@ dialog::backdrop { background: #102f3b70; }
     <p id="backup-status" class="backup-note" role="status"></p>
     <button id="restore-backup" class="danger" type="button" hidden>确认替换当前账本</button>
   </dialog>
-  <dialog id="asset-editor" aria-labelledby="asset-editor-title">
+  <dialog id="budget-editor" class="record-editor" aria-labelledby="budget-editor-title">
+    <form id="budget-form">
+      <header class="dialog-header"><h2 id="budget-editor-title">设置支出计划</h2><button type="button" id="close-budget-editor" class="icon-button" aria-label="关闭" autofocus><svg aria-hidden="true"><use href="#close"/></svg></button></header>
+      <div id="budget-editor-body" class="record-editor-body">
+        <p id="budget-month" class="asset-form-hint"></p>
+        <div id="budget-fields" class="field-grid"></div>
+      </div>
+      <footer class="dialog-footer">
+        <p id="budget-error" class="form-error" role="status"></p>
+        <button class="primary" type="submit">保存计划</button>
+      </footer>
+    </form>
+  </dialog>
+  <dialog id="asset-editor" class="record-editor" aria-labelledby="asset-editor-title">
     <form id="asset-form" autocomplete="off">
       <header class="dialog-header"><h2 id="asset-editor-title">记录资产</h2><button type="button" id="close-asset-editor" class="icon-button" aria-label="关闭"><svg aria-hidden="true"><use href="#close"/></svg></button></header>
       <div id="asset-editor-body" class="record-editor-body">
@@ -475,7 +522,7 @@ dialog::backdrop { background: #102f3b70; }
     <h3 class="asset-selected-title">已选列目</h3>
     <div id="asset-column-list"></div>
   </dialog>
-  <dialog id="editor" aria-labelledby="editor-title">
+  <dialog id="editor" class="record-editor" aria-labelledby="editor-title">
     <form id="entry-form" autocomplete="off">
       <header class="dialog-header"><h2 id="editor-title">记一笔</h2><button type="button" id="close-editor" class="icon-button" aria-label="关闭" autofocus><svg><use href="#close"/></svg></button></header>
       <div id="entry-editor-body" class="record-editor-body">
@@ -535,6 +582,7 @@ dialog::backdrop { background: #102f3b70; }
 
 const $ = (id) => document.getElementById(id);
 const storageKey = "riri-ledger-v1";
+const budgetKey = "riri-expense-plans-v1";
 const currency = new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" });
 const categories = {
   expense: {
@@ -558,6 +606,9 @@ const today = new Intl.DateTimeFormat("sv-SE", {
 }).format();
 let month = today.slice(0, 7);
 let filter = "all";
+let planMode = "month";
+let planMonth = month;
+let planYear = month.slice(0, 4);
 let editingId = null;
 let noticeTimer;
 let entryPoint = null;
@@ -606,6 +657,7 @@ window.addEventListener("storage", (event) => {
     records = load();
     render();
   }
+  if (event.key === budgetKey) render();
 });
 
 function save(next) {
@@ -726,17 +778,87 @@ function renderCategoryChart(entries, total, type) {
   });
 }
 
-function renderCashFlowChart(income, expense) {
-  const hasNegative = income < 0 || expense < 0;
-  drawChart([
-    { label: "收入合计", amount: income, color: "#188361" },
-    { label: "支出合计", amount: expense, color: "#cb793f" },
-  ], {
-    title: "收支占比",
-    description: hasNegative ? "按本月收入和支出净额的绝对值计算占比" : "本月收入与支出占比",
-    centerLabel: hasNegative ? "绝对值合计" : "收支合计",
-    centerAmount: Math.abs(income) + Math.abs(expense),
-  });
+function readBudgets() {
+  return JSON.parse(localStorage.getItem(budgetKey) ?? "{}");
+}
+
+function renderBudgetChart(container, period) {
+  let planned = {};
+  try {
+    planned = readBudgets()[period] ?? {};
+  } catch {
+    // Keep actual expenses visible if the plans cannot be read.
+  }
+  const actual = new Map();
+  for (const entry of records ?? []) {
+    if (entry.type !== "expense" || !entry.date.startsWith(period + "-")) continue;
+    actual.set(entry.category, (actual.get(entry.category) ?? 0) + entry.amount);
+  }
+  const rows = Object.keys(categories.expense).map((category) => ({
+    category, plan: planned[category] ?? null, actual: actual.get(category) ?? 0,
+  }));
+  const amounts = rows.flatMap((row) => [row.plan ?? 0, row.actual]);
+  const min = Math.min(0, ...amounts);
+  const max = Math.max(0, ...amounts);
+  const span = max - min || 1;
+  const position = (amount) => (amount - min) / span * 100;
+  container.replaceChildren();
+  for (const row of rows) {
+    const group = document.createElement("div");
+    group.className = "budget-category";
+    const heading = document.createElement("h3");
+    heading.textContent = row.category;
+    group.append(heading);
+    for (const [type, label] of [["plan", "计划支出"], ["actual", "实际支出"]]) {
+      const amount = row[type];
+      const line = document.createElement("div");
+      line.className = "budget-line " + type;
+      const caption = document.createElement("span");
+      caption.textContent = label;
+      const track = document.createElement("span");
+      track.className = "budget-track";
+      track.setAttribute("aria-hidden", "true");
+      if (min < 0) {
+        track.classList.add("negative-scale");
+        track.style.setProperty("--zero", position(0) + "%");
+      }
+      if (amount) {
+        const bar = document.createElement("span");
+        bar.className = "budget-bar";
+        bar.style.left = position(Math.min(0, amount)) + "%";
+        bar.style.width = Math.abs(amount) / span * 100 + "%";
+        track.append(bar);
+      }
+      const value = document.createElement("strong");
+      value.textContent = amount === null ? "未设置" : money(amount);
+      line.append(caption, track, value);
+      group.append(line);
+    }
+    container.append(group);
+  }
+}
+
+function planPeriod() {
+  return planMode === "year" ? planYear : planMonth;
+}
+
+function periodLabel(period) {
+  if (period.length === 4) return Number(period) + "年";
+  const [year, monthNumber] = period.split("-").map(Number);
+  return year + "年" + monthNumber + "月";
+}
+
+function renderPlans() {
+  const period = planPeriod();
+  $("plan-period").textContent = periodLabel(period);
+  $("plan-prev").disabled = period === "0001" || period === "0001-01";
+  $("plan-next").disabled = period === "9999" || period === "9999-12";
+  const name = planMode === "year" ? "年计划" : "月计划";
+  $("plan-chart-title").textContent = name + "与实际支出";
+  $("edit-period-budget").textContent = "设置" + name;
+  document.querySelectorAll("[data-plan-mode]").forEach((button) =>
+    button.setAttribute("aria-pressed", String(button.dataset.planMode === planMode)));
+  renderBudgetChart($("plan-chart"), period);
 }
 
 function render() {
@@ -758,15 +880,28 @@ function render() {
   $("demo-bar").hidden = records !== null;
   filters.forEach((button) => button.setAttribute("aria-pressed", button.dataset.filter === filter));
   renderEntries(entries);
-  if (filter === "income") renderCategoryChart(incomes, income, "income");
-  else if (filter === "expense") renderCategoryChart(expenses, expense, "expense");
-  else renderCashFlowChart(income, expense);
+  const showBudget = filter === "all";
+  $("budget-chart").hidden = !showBudget;
+  $("edit-budget").hidden = !showBudget;
+  $("ring").hidden = showBudget;
+  $("legend").hidden = showBudget;
+  if (showBudget) {
+    $("chart-title").textContent = "支出计划";
+    $("chart-description").textContent = "按分类对比本月计划与实际支出";
+    renderBudgetChart($("budget-chart"), month);
+  } else if (filter === "income") renderCategoryChart(incomes, income, "income");
+  else renderCategoryChart(expenses, expense, "expense");
+  if (!$("plans").hidden) renderPlans();
+}
+
+function shiftedMonth(period, step) {
+  const [year, number] = period.split("-").map(Number);
+  const target = year * 12 + number - 1 + step;
+  return String(Math.floor(target / 12)).padStart(4, "0") + "-" + String(target % 12 + 1).padStart(2, "0");
 }
 
 function shiftMonth(step) {
-  const [year, number] = month.split("-").map(Number);
-  const target = year * 12 + number - 1 + step;
-  month = String(Math.floor(target / 12)).padStart(4, "0") + "-" + String(target % 12 + 1).padStart(2, "0");
+  month = shiftedMonth(month, step);
   render();
 }
 
@@ -910,6 +1045,71 @@ document.addEventListener("close", (event) => {
 }, true);
 
 const entryAmount = createAmountField($("entry-amount-field"), "金额（元）", 9, "0.00");
+
+const budgetEditor = $("budget-editor");
+const budgetFields = new Map();
+let editingPeriod;
+for (const category of Object.keys(categories.expense)) {
+  const container = document.createElement("div");
+  const field = createAmountField(container, category, 9, "未设置");
+  budgetFields.set(category, field);
+  $("budget-fields").append(container);
+}
+
+function openBudgetEditor(period) {
+  let budgets;
+  try {
+    budgets = readBudgets();
+  } catch {
+    announce("无法读取支出计划。");
+    return;
+  }
+  editingPeriod = period;
+  const current = budgets[period] ?? {};
+  for (const [category, field] of budgetFields) field.reset(current[category]);
+  $("budget-month").textContent = periodLabel(period) + " · 留空表示未设置";
+  $("budget-error").textContent = "";
+  budgetEditor.showModal();
+  $("budget-editor-body").scrollTop = 0;
+}
+
+$("edit-budget").addEventListener("click", () => openBudgetEditor(month));
+$("edit-period-budget").addEventListener("click", () => openBudgetEditor(planPeriod()));
+$("close-budget-editor").addEventListener("click", () => budgetEditor.close());
+$("budget-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const plan = {};
+  for (const [category, field] of budgetFields) {
+    const cents = field.cents;
+    if (cents !== null) plan[category] = cents;
+  }
+  try {
+    const budgets = readBudgets();
+    if (Object.keys(plan).length) budgets[editingPeriod] = plan;
+    else delete budgets[editingPeriod];
+    localStorage.setItem(budgetKey, JSON.stringify(budgets));
+  } catch {
+    $("budget-error").textContent = "保存失败，请检查浏览器存储。";
+    return;
+  }
+  budgetEditor.close();
+  render();
+  announce("已保存支出计划");
+});
+
+for (const button of document.querySelectorAll("[data-plan-mode]")) {
+  button.addEventListener("click", () => {
+    planMode = button.dataset.planMode;
+    renderPlans();
+  });
+}
+for (const [id, step] of [["plan-prev", -1], ["plan-next", 1]]) {
+  $(id).addEventListener("click", () => {
+    if (planMode === "month") planMonth = shiftedMonth(planMonth, step);
+    else planYear = String(Number(planYear) + step).padStart(4, "0");
+    renderPlans();
+  });
+}
 
 function syncDateDisplay(input) {
   input.parentElement.querySelector(".date-value").textContent = input.value || "选择日期";
@@ -1679,17 +1879,19 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
     if (columnsDialog.open) renderColumnEditor();
   });
   function route() {
-    const showingAssets = window.location.hash === "#assets";
-    $("overview").hidden = showingAssets;
-    $("export").hidden = showingAssets;
-    $("assets").hidden = !showingAssets;
-    for (const [id, active] of [["nav-overview", !showingAssets], ["nav-assets", showingAssets]]) {
-      const link = $(id);
+    const hash = window.location.hash.slice(1);
+    const page = hash === "assets" || hash === "plans" ? hash : "overview";
+    $("export").hidden = page !== "overview";
+    for (const id of ["overview", "assets", "plans"]) {
+      const active = id === page;
+      $(id).hidden = !active;
+      const link = $("nav-" + id);
       link.classList.toggle("active", active);
       if (active) link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
     }
-    if (showingAssets) renderAssets();
+    if (page === "assets") renderAssets();
+    if (page === "plans") renderPlans();
   }
   window.addEventListener("hashchange", route);
   route();
@@ -1707,6 +1909,12 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
   function validBackup(backup) {
     if (backup?.format !== "riri-ledger" || backup.version !== 1 ||
       !Array.isArray(backup.records) || !Array.isArray(backup.hiddenPresets)) return false;
+    if (backup.budgets !== undefined && (!isObject(backup.budgets) ||
+      !Object.entries(backup.budgets).every(([period, plan]) =>
+        (validMonth(period) || (/^\d{4}$/.test(period) && period !== "0000")) &&
+        isObject(plan) && Object.entries(plan).every(([category, amount]) =>
+          Object.hasOwn(categories.expense, category) && Number.isSafeInteger(amount) &&
+          Math.abs(amount) <= 99999999999)))) return false;
     const entryIds = new Set();
     for (const entry of backup.records) {
       if (!isObject(entry) || typeof entry.id !== "string" || !entry.id || entryIds.has(entry.id) ||
@@ -1758,6 +1966,7 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
         version: 1,
         records: JSON.parse(localStorage.getItem(storageKey) ?? "[]"),
         assets: readAssets(),
+        budgets: readBudgets(),
         hiddenPresets: readHiddenPresets(),
       };
       const url = URL.createObjectURL(new Blob([JSON.stringify(backup)], { type: "application/json" }));
@@ -1787,8 +1996,9 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
       if (!backupDialog.open || selection !== backupSelection) return;
       if (!validBackup(backup)) throw new Error("Invalid backup");
       pendingBackup = backup;
-      const { records: entries, assets } = backup;
-      backupStatus.textContent = `备份中有 ${entries.length} 笔账单、${entries.filter((entry) => entry.photo).length} 张照片、${Object.keys(assets.snapshots).length} 个月的资产记录。`;
+      const { records: entries, assets, budgets } = backup;
+      backupStatus.textContent = `备份中有 ${entries.length} 笔账单、${entries.filter((entry) => entry.photo).length} 张照片、${Object.keys(assets.snapshots).length} 个月的资产记录。`
+        + (budgets ? `另有 ${Object.keys(budgets).length} 个周期的支出计划。` : "");
       restoreButton.hidden = false;
     } catch {
       if (backupDialog.open && selection === backupSelection) backupStatus.textContent = "无法读取备份，请选择 20 MB 以内的日日记账备份文件。";
@@ -1796,12 +2006,15 @@ for (const eventName of ["gesturestart", "gesturechange"]) {
   });
 
   restoreButton.addEventListener("click", () => {
-    if (!pendingBackup || !window.confirm("恢复会替换当前浏览器里的账单和月度资产。确定继续？")) return;
+    if (!pendingBackup) return;
+    const dataTypes = pendingBackup.budgets ? "账单、月度资产和支出计划" : "账单和月度资产";
+    if (!window.confirm("恢复会替换当前浏览器里的" + dataTypes + "。确定继续？")) return;
     const changes = [
       [storageKey, pendingBackup.records],
       [key, pendingBackup.assets],
       [hiddenPresetsKey, pendingBackup.hiddenPresets],
     ];
+    if (pendingBackup.budgets) changes.push([budgetKey, pendingBackup.budgets]);
     const previous = [];
     try {
       for (const [target] of changes) previous.push([target, localStorage.getItem(target)]);
